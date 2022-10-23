@@ -1,116 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
 export default function ChessBoard() {
-  // const [board, setBoard] = useState(
-  //   [
-  //     {id: 'A8', figure: 'rookBlack'},
-  //     {id: 'B8', figure: 'knightBlack'},
-  //     {id: 'C8', figure: 'bishopBlack'},
-  //     {id: 'D8', figure: 'queenBlack'},
-  //     {id: 'E8', figure: 'kingBlack'},
-  //     {id: 'F8', figure: 'bishopBlack'},
-  //     {id: 'G8', figure: 'knightBlack'},
-  //     {id: 'H8', figure: 'rookBlack'},
-  //     {id: 'A7', figure: 'pawnBlack'},
-  //     {id: 'B7', figure: 'pawnBlack'},
-  //     {id: 'C7', figure: 'pawnBlack'},
-  //     {id: 'D7', figure: 'pawnBlack'},
-  //     {id: 'E7', figure: 'pawnBlack'},
-  //     {id: 'F7', figure: 'pawnBlack'},
-  //     {id: 'G7', figure: 'pawnBlack'},
-  //     {id: 'H7', figure: 'pawnBlack'},
-  //     {id: 'A6',},
-  //     {id: 'B6',},
-  //     {id: 'C6',},
-  //     {id: 'D6',},
-  //     {id: 'E6',},
-  //     {id: 'F6',},
-  //     {id: 'G6',},
-  //     {id: 'H6',},
-  //     {id: 'A5',},
-  //     {id: 'B5',},
-  //     {id: 'C5',},
-  //     {id: 'D5',},
-  //     {id: 'E5',},
-  //     {id: 'F5',},
-  //     {id: 'G5',},
-  //     {id: 'H5',},
-  //     {id: 'A4',},
-  //     {id: 'B4',},
-  //     {id: 'C4',},
-  //     {id: 'D4',},
-  //     {id: 'E4',},
-  //     {id: 'F4',},
-  //     {id: 'G4',},
-  //     {id: 'H4',},
-  //     {id: 'A3',},
-  //     {id: 'B3',},
-  //     {id: 'C3',},
-  //     {id: 'D3',},
-  //     {id: 'E3',},
-  //     {id: 'F3',},
-  //     {id: 'G3',},
-  //     {id: 'H3',},
-  //     {id: 'A2', figure: 'pawnWhite'},
-  //     {id: 'B2', figure: 'pawnWhite'},
-  //     {id: 'C2', figure: 'pawnWhite'},
-  //     {id: 'D2', figure: 'pawnWhite'},
-  //     {id: 'E2', figure: 'pawnWhite'},
-  //     {id: 'F2', figure: 'pawnWhite'},
-  //     {id: 'G2', figure: 'pawnWhite'},
-  //     {id: 'H2', figure: 'pawnWhite'},
-  //     {id: 'A1', figure: 'rookWhite'},
-  //     {id: 'B1', figure: 'knightWhite'},
-  //     {id: 'C1', figure: 'bishopWhite'},
-  //     {id: 'D1', figure: 'queenWhite'},
-  //     {id: 'E1', figure: 'kingWhite'},
-  //     {id: 'F1', figure: 'bishopWhite'},
-  //     {id: 'G1', figure: 'knightWhite'},
-  //     {id: 'H1', figure: 'rookWhite'},
-
-  //   ]
-  // )
-   
-
-
-  
-//  function defaultPawnInit (y, color) {
-//   for (let i = 0; i < maxBoardWidth; i++) {
-//     setFigureInCell(figures.find(f => f.type == 'pawn' && f.color == color), i, y)
-//   }
-//  }
-
-// function defaultKnightInit (y, color) {
-//   for (let i = 1; i < maxBoardWidth; i+=5) {
-//     setFigureInCell(figures.find(f => f.type == 'knight' && f.color == color), i, y)
-//   }
-// }
- 
-// function defaultBishopInit (y, color) {
-//   for (let i = 2; i <maxBoardWidth; i+=3) {
-//     setFigureInCell(figures.find(f => f.type == 'bishop' && f.color === color), i, y)
-//   }
-// }
-
-// function defaultRookInit (y, color) {
-//   for (let i = 0; i <maxBoardWidth; i+=7) {
-//     setFigureInCell(figures.find(f => f.type == 'rook' && f.color === color), i, y)
-//   }
-// }
-
-// function defaultKingInit (y, color) {
-//   for (let i = 4; i < maxBoardWidth; i+=4) {
-//     setFigureInCell(figures.find(f => f.type == 'king' && f.color === color), i, y)
-//   }
-// }
-
-// function defaultQueenInit (y, color) {
-//   for (let i = 3; i < maxBoardWidth; i+=5) {
-//     setFigureInCell(figures.find(f => f.type == 'queen' && f.color === color), i, y)
-//   }
-// }
-
-
 
 const maxBoardWidth = 8
 const maxBoardHeight = 8 
@@ -150,11 +40,17 @@ function setFigureInCell(fig, x, y) {
   )
  }
 
-// function defaultFigurePosition(start, step, type, color, y ) {
-//   for (let i = start; i < maxBoardWidth; i += step) {
-//     setFigureInCell(figures.find(f => f.type == type && f.color == color), i, y)
-//   }
-// }
+function setDefaultFigurePosition(arr) {
+  let arrayOfFoundElements = []
+  let foundFigure;
+  arr.forEach(el=> {
+  for (let i = el.start; i < maxBoardWidth; i += el.xOffsetBetweenFigures) {
+    foundFigure = figures.find(f => f.type == el.type && f.color == el.color && !arrayOfFoundElements.includes(f))
+    arrayOfFoundElements.push(foundFigure)
+    setFigureInCell(foundFigure, i, el.y)
+  }
+});
+}
 
 let arrDefaultFigurePosition = [
    {start: 0, xOffsetBetweenFigures: 1, type: 'pawn', color: 'black', y: 6},
@@ -171,36 +67,12 @@ let arrDefaultFigurePosition = [
    {start: 0, xOffsetBetweenFigures: 7, type: 'rook', color: 'white', y: 0},
 ]
 
-function setDefaultFigurePosition(arr) {
-  let arrayOfFoundElements = []
-  let foundFigure;
-  arr.forEach(el=> {
-  for (let i = el.start; i < maxBoardWidth; i += el.xOffsetBetweenFigures) {
-    foundFigure = figures.find(f => f.type == el.type && f.color == el.color && !arrayOfFoundElements.includes(f))
-    arrayOfFoundElements.push(foundFigure)
-    setFigureInCell(foundFigure, i, el.y)
-  }
-});
-}
-
 
 useEffect(() => {
   setDefaultFigurePosition(arrDefaultFigurePosition)
-  // defaultFigurePosition(0, 1, 'pawn', 'black', 6)
-  // defaultFigurePosition(0, 1, 'pawn', 'white', 1)
-  // defaultFigurePosition(4, 4, 'king', 'black', 7)
-  // defaultFigurePosition(4, 4, 'king', 'white', 0)
-  // defaultFigurePosition(3, 5, 'queen', 'black', 7)
-  // defaultFigurePosition(3, 5, 'queen', 'white', 0)
-  // defaultFigurePosition(1, 5, 'knight', 'black', 7)
-  // defaultFigurePosition(1, 5, 'knight', 'white', 0)
-  // defaultFigurePosition(2, 3, 'bishop', 'black', 7)
-  // defaultFigurePosition(2, 3, 'bishop', 'white', 0)
-  // defaultFigurePosition(0, 7, 'rook', 'black', 7)
-  // defaultFigurePosition(0, 7, 'rook', 'white', 0)
   }, [])
 
-  console.log(figures)
+console.log(figures)
 console.log(cells)
 
 let getFigureIcon = (arr, el) => arr.find(it => it.value == el.figure.type).icon
