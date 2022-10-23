@@ -88,47 +88,33 @@ let getFigureIcon = (arr, el) => arr.find(it => it.value == el.figure.type).icon
         )}
       </div>
       <div className='d-flex justify-content-center flex-wrap m-auto position-relative'>
-        <div
-          className='px-1 w-100 h-100 d-flex position-absolute 
-          flex-column justify-content-around align-items-start'
-        >
-          {numbersAxis.map((item, i) =>
-            <div key={i} className='py-3 fw-bold'>{item}</div>
-          )}
-        </div>
-        <div
-          className='px-1 w-100 h-100 d-flex position-absolute 
-          flex-column justify-content-around align-items-end'
-        >
-          {numbersAxis.map((item, i) =>
-            <div key={i} className='py-3 fw-bold'>{item}</div>
-          )}
-        </div>
-        {/* строка - дублирование кода, за исключением align-items-*, как фиксить */}
+        {['start', 'end'].map(pos =>
+          <div
+            className={`px-1 w-100 h-100 d-flex position-absolute 
+            flex-column justify-content-around align-items-${pos}`}
+          >
+            {numbersAxis.map((item, i) =>
+              <div key={i} className='py-3 fw-bold'>{item}</div>
+            )}
+          </div>
+        )}
         {
           cells.map((cell, i) => (
-            <div key={cell.id}>
-              <div
-                className={`bg-${
-                  // cell.x % 2 == 0 && cell.y % 2 == 0 || cell.x % 2 !== 0 && cell.y % 2 !== 0 ? 'lighter' : 'brown'
-                  Math.floor(i / maxBoardWidth) % 2 == 0 && i % 2 == 0 || Math.floor(i / maxBoardWidth) % 2 !== 0 && i % 2 !== 0 ?
-                    'lighter' : 'brown'
-                  } opacity-75 d-flex justify-content-center align-items-center`
-                }
-                style={{ width: "4rem", height: "4rem" }}
-              >
-                {/* {cell.id} */}
-                {cell.figure ?            
-                  <div 
-                    className ={`${getFigureIcon(figureTypes, cell)} fs-1 text-${cell.figure.color}`}
-                    // className ={`${figureTypes.find(it => it.value == cell.figure.type).icon} fs-1 text-${cell.figure.color}`}
-                  >
-                    <div className='fs-5'>
-                      {cell.figure.id}
-                    </div>
-                  </div>
-                : cell.id}  
-              </div>
+            <div
+              key={cell.id}
+              className={`bg-${cell.x % 2 == 0 && cell.y % 2 == 0 || cell.x % 2 !== 0 && cell.y % 2 !== 0 ? 'lighter' : 'brown'} 
+                opacity-75 d-flex justify-content-center align-items-center`
+              }
+              style={{ width: "4rem", height: "4rem" }}
+            >
+              {/* {cell.id} */}
+              {cell.figure ?            
+                <div 
+                  className ={`${getFigureIcon(figureTypes, cell)} fs-1 text-${cell.figure.color}`}
+                >
+                  <div className='fs-5'>{cell.figure.id}</div>
+                </div>
+              : cell.id}  
             </div>
           ))
         }
