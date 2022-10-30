@@ -5,7 +5,7 @@ export default function ChessBoard() {
 const maxBoardWidth = 8
 const maxBoardHeight = 8 
 const letterACodeInASCII = 65
-
+ 
 let numbersAxis = Array.from({length: maxBoardHeight}, (el, i) => maxBoardHeight  - i)
 let lettersAxis = Array.from({length: maxBoardWidth}, (el, i) =>  String.fromCharCode(i + letterACodeInASCII))
   
@@ -14,12 +14,12 @@ const figureTypes =
 
 const [figures, setFigures] = useState(Array.from({length: 32}, (el, i) => (
     {  
-      id: i,
+      id: i + 1,
       color: i < 16  ? 'black': 'white',
       type: ('rook ' + 'knight ' + 'bishop '  + 'queen ' + 'king ' + 'bishop ' + 'knight ' + 'rook ' + 'pawn '.repeat(8)).split(' ')[i % (maxBoardWidth * 2)], 
      }
   )
-)) 
+))  
 
 const [cells, setCells] = useState(Array.from({length: maxBoardWidth * maxBoardHeight}, (el, i) => (
   {
@@ -32,22 +32,22 @@ const [cells, setCells] = useState(Array.from({length: maxBoardWidth * maxBoardH
 ))
 
 
-function setFigureInCell(fig, x, y) {
+function setFigureInCell(figId, x, y) {
   setCells((prev) => 
     prev.map(el => (
-       {...el, figure: el.x == x && el.y == y ? fig : el.figure}
+       {...el, figure: el.x == x && el.y == y ? figId : el.figure}
     ))
   )
  }
 
 function setDefaultFigurePosition(arr) {
-  let arrayOfFoundElements = []
-  let foundFigure;
+  let arrayOfFoundElementsId = []
+  let foundFigureId;
   arr.forEach(el=> {
   for (let i = el.start; i < maxBoardWidth; i += el.xOffsetBetweenFigures) {
-    foundFigure = figures.find(f => f.type == el.type && f.color == el.color && !arrayOfFoundElements.includes(f))
-    arrayOfFoundElements.push(foundFigure)
-    setFigureInCell(foundFigure, i, el.y)
+    foundFigureId = figures.find(f => f.type == el.type && f.color == el.color && !arrayOfFoundElementsId.includes(f.id)).id
+    arrayOfFoundElementsId.push(foundFigureId)
+    setFigureInCell(foundFigureId, i, el.y)
   }
 });
 }
@@ -72,16 +72,31 @@ useEffect(() => {
   setDefaultFigurePosition(arrDefaultFigurePosition)
   }, [])
 
-console.log(figures)
-console.log(cells)
+// console.log(figures)
+// console.log(cells)
 
-let getFigureIcon = (arr, el) => arr.find(it => it.value == el.figure.type).icon
+
+let getFigure = (id) => figures.find(el => el.id == id)
+
+let renderFigure = (id) => {
+let figure = getFigure(id)
+  if (figure) {
+    return figureTypes.find(it => it.value == figure.type).icon + ' text-' + figure.color 
+  }
+  }
+
+  let currentSide = (id) => {
+    let figure = getFigure(id)
+    console.log(figure)
+    return (figure?.color  == 'white' ? 'activeSide' : null) 
+  }
 
   return (
     <div
       style={{ width: '550px', backgroundColor: '#fede97' }}
       className='m-auto'
     >
+      
       <div className='d-flex px-3 w-100'>
         {lettersAxis.map((item, i) =>
           <div key={i} className='px-4 m-auto fw-bold'>{item}</div>
@@ -103,16 +118,15 @@ let getFigureIcon = (arr, el) => arr.find(it => it.value == el.figure.type).icon
             <div
               key={cell.id}
               className={`bg-${cell.x % 2 == 0 && cell.y % 2 == 0 || cell.x % 2 !== 0 && cell.y % 2 !== 0 ? 'lighter' : 'brown'} 
-                opacity-75 d-flex justify-content-center align-items-center`
+              ${currentSide(cell.figure)} opacity-75 d-flex justify-content-center align-items-center`
               }
               style={{ width: "4rem", height: "4rem" }}
             >
-              {/* {cell.id} */}
               {cell.figure ?            
                 <div 
-                  className ={`${getFigureIcon(figureTypes, cell)} fs-1 text-${cell.figure.color}`}
+                  className = {`${renderFigure(cell.figure)} fs-1`}
                 >
-                  <div className='fs-5'>{cell.figure.id}</div>
+                  <div className='fs-5'>{cell.figure}</div>
                 </div>
               : cell.id}  
             </div>

@@ -16,11 +16,14 @@
   padding: 15px 0;
 }
 
-
 .bg-brown {
   background-color: rgb(112, 67, 49);
 }
 
 .bg-lighter {
   background-color: rgb(243, 194, 155);
+}
+
+.activeSide:hover {
+  background-color: rgb(81, 136, 55);
 }
