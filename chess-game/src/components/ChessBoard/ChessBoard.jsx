@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
+
 export default function ChessBoard() {
 
 const maxBoardWidth = 8
@@ -10,7 +11,17 @@ let numbersAxis = Array.from({length: maxBoardHeight}, (el, i) => maxBoardHeight
 let lettersAxis = Array.from({length: maxBoardWidth}, (el, i) =>  String.fromCharCode(i + letterACodeInASCII))
   
 const figureTypes = 
-['king', 'queen', 'knight', 'bishop', 'rook', 'pawn'].map(value => ({value, icon: 'fa-solid fa-chess-' + value}))
+['king', 'queen', 'knight', 'bishop', 'rook', 'pawn'].map(value => (
+  {
+    value,
+    icon: 'fa-solid fa-chess-' + value, 
+    whereFigureCanGo: () => {} 
+  }
+  ))
+
+  let whereFigureCanGo = [
+    {type:'pawn', x: '', y: 1 || 2, color: ''}
+  ]
 
 const [figures, setFigures] = useState(Array.from({length: 32}, (el, i) => (
     {  
@@ -31,6 +42,9 @@ const [cells, setCells] = useState(Array.from({length: maxBoardWidth * maxBoardH
   )
 ))
 
+let getDeafultCellColor = (x, y) => {
+  return x % 2 == 0 && y % 2 == 0 || x % 2 !== 0 && y % 2 !== 0 ? 'bg-lightColored' : 'bg-brown'
+}
 
 function setFigureInCell(figId, x, y) {
   setCells((prev) => 
@@ -72,24 +86,47 @@ useEffect(() => {
   setDefaultFigurePosition(arrDefaultFigurePosition)
   }, [])
 
-// console.log(figures)
-// console.log(cells)
+const [move, setMove] = useState({})
+
+useEffect(() => {
+
+}, [move])
 
 
-let getFigure = (id) => figures.find(el => el.id == id)
+let getFigureById = (id) => figures.find(el => el.id == id)
 
 let renderFigure = (id) => {
-let figure = getFigure(id)
+let figure = getFigureById(id)
   if (figure) {
     return figureTypes.find(it => it.value == figure.type).icon + ' text-' + figure.color 
   }
   }
 
-  let currentSide = (id) => {
-    let figure = getFigure(id)
-    console.log(figure)
-    return (figure?.color  == 'white' ? 'activeSide' : null) 
+  let [playerSide, setPlayerSide] = useState('white')
+
+  let canActivateCell = (cell) => {
+    let figure = getFigureById(cell.figure)
+    return (figure?.color == playerSide && !cell.activeCell ? 'activeSide' : null) 
   }
+
+  let findInCell = (x, y) => {
+    let foundFigureIdInCell = cells.find(f => x === f.x && y === f.y).figure
+    let figure = getFigureById(foundFigureIdInCell)
+    if(!foundFigureIdInCell) {
+      console.log('figure not found')
+    } else if (figure.color === playerSide) {
+      setCells(prev =>  
+      prev.map(el => (
+        {...el, activeCell: el.x == x && el.y == y ? true : false}
+      )
+        )
+      )
+         
+      let figure = figures.find(el => el.id === foundFigureIdInCell)
+    } 
+  }
+
+// console.log(cells)
 
   return (
     <div
@@ -117,18 +154,17 @@ let figure = getFigure(id)
           cells.map((cell, i) => (
             <div
               key={cell.id}
-              className={`bg-${cell.x % 2 == 0 && cell.y % 2 == 0 || cell.x % 2 !== 0 && cell.y % 2 !== 0 ? 'lighter' : 'brown'} 
-              ${currentSide(cell.figure)} opacity-75 d-flex justify-content-center align-items-center`
-              }
+              className={getDeafultCellColor(cell.x, cell.y) + 
+                " opacity-75 d-flex justify-content-center align-items-center " + canActivateCell(cell) + " " + 
+                (cell.activeCell ? "activeCell" : "")}
               style={{ width: "4rem", height: "4rem" }}
+              onClick = {() => findInCell(cell.x, cell.y)}
             >
               {cell.figure ?            
-                <div 
-                  className = {`${renderFigure(cell.figure)} fs-1`}
-                >
-                  <div className='fs-5'>{cell.figure}</div>
+                <div className = {`${renderFigure(cell.figure)} fs-1`}>
+                  {/* <div className='fs-5'>{cell.figure}</div> */}
                 </div>
-              : cell.id}  
+              : null}  
             </div>
           ))
         }
