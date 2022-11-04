@@ -9,7 +9,6 @@ function App() {
       <div className="App">
         <div className="content">
           <ChessBoard />
-          {/* <Test /> */}
         </div>
       </div>
     </BrowserRouter>
