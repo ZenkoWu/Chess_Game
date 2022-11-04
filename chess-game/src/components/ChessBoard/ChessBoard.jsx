@@ -15,20 +15,22 @@ const figureTypes =
   {
     value,
     icon: 'fa-solid fa-chess-' + value, 
-    whereFigureCanGo: () => {} 
+    // whereFigureCanGo: () => {} 
   }
   ))
 
-  let whereFigureCanGo = [
-    {type:'pawn', x: '', y: 1 || 2, color: ''}
-  ]
+  // let whereFigureCanGo = [
+  //   {type:'pawn', x: '', y: 1 || 2, color: ''}
+  // ]
 
 const [figures, setFigures] = useState(Array.from({length: 32}, (el, i) => (
     {  
       id: i + 1,
       color: i < 16  ? 'black': 'white',
       type: ('rook ' + 'knight ' + 'bishop '  + 'queen ' + 'king ' + 'bishop ' + 'knight ' + 'rook ' + 'pawn '.repeat(8)).split(' ')[i % (maxBoardWidth * 2)], 
-     }
+     
+    icon: 'fa-solid fa-chess-' + 'pawn ',
+    }
   )
 ))  
 
@@ -87,22 +89,26 @@ useEffect(() => {
   setDefaultFigurePosition(arrDefaultFigurePosition)
   }, [])
 
+  let getFigureById = (id) => figures.find(el => el.id == id)
 
-let getFigureById = (id) => figures.find(el => el.id == id)
+  let renderFigure = (id) => {
+  let figure = getFigureById(id)
+    if (figure) {
+      return figureTypes.find(it => it.value == figure.type).icon + ' text-' + figure.color 
+    }
+    }
 
-let renderFigure = (id) => {
-let figure = getFigureById(id)
-  if (figure) {
-    return figureTypes.find(it => it.value == figure.type).icon + ' text-' + figure.color 
-  }
-  }
+const [playerSide, setPlayerSide] = useState('white')
 
 const [move, setMove] = useState({})
+
 const [history, setHistory] = useState([])
-let historyPush = move => setHistory(prev => [...prev, move.secondTap])
+
+let historyPush = (move) => setHistory(prev => 
+  // [...prev, {firstTap: move.firstTap, secondTap: move.secondTap, figureColor: playerSide}])
+  [...prev, {...move, figureColor: playerSide}])
 
 useEffect(() => {
-  console.log(move)
   if(move.secondTap){
     historyPush(move)
     setMove({})
@@ -110,7 +116,7 @@ useEffect(() => {
     // setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y)
     //   setCells((prev) => 
     //   prev.map(el => {
-    //     if(el.id == move.firstTap.id) {
+    //     if(el.id == move.firstTap?.id) {
     //       return {...el, figure: null}
     //     } else {
     //       return el
@@ -130,16 +136,23 @@ useEffect(() => {
 }, [move])
 
 console.log(history)
+
 let changeFigurePosition = (foundFigId, cell) => {
   setFigureInCell(foundFigId, cell.x, cell.y)
-  console.log(cells)
+  // console.log(cells)
 }
 
-  let [playerSide, setPlayerSide] = useState('white')
-
   const [availableToMove, setAvailableToMove] = useState([])
+  
+  let whereFigureCanGoo = [
+    {id: 'D2', dots: ['D3','D4']},
+    {id: 'C2', dots: ['C3','C4']},
+    {id: 'A2', dots: ['A3','A4']},
+    {id: 'C7', dots: ['C6','C5']},
+    {id: 'B8', dots: ['C6','A6']},
+  ]
 
-  let isCellFirstTap = cell => (cell.id === move.firstTap?.id) 
+  let isCellFirstTap = cell => (cell.id == move.firstTap?.id) 
 
   let canActivateCell = (cell) => {
     let figure = getFigureById(cell.figure)
@@ -147,11 +160,17 @@ let changeFigurePosition = (foundFigId, cell) => {
   }
 
   let setM = (cell) => {
-    let foundFigureIdInCell = cells.find(f => cell.x === f.x && cell.y === f.y).figure
-    let figure = getFigureById(foundFigureIdInCell)
+    let figure = getFigureById(cell.figure)
+
     if (figure?.color === playerSide) {
+
       setMove(prev => ({...prev, firstTap: cell}))
-    } else {
+
+      let canGo = whereFigureCanGoo.find(el => el.id === cell.id)
+      setAvailableToMove([...canGo.dots])
+
+    } else if (availableToMove.includes(cell.id)) {
+    // (availableToMove.find(el => el.dots.includes(cell.id) && el.type == figure.type)) {
       setMove(prev => ({...prev, secondTap: cell}))
       setFigureInCell(move.firstTap.figure, cell.x, cell.y)
       setCells((prev) => 
@@ -161,38 +180,55 @@ let changeFigurePosition = (foundFigId, cell) => {
         } else {
           return el
         }
+        
       }
       ))
-    
       
+    // setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
+    setAvailableToMove([])
     }
   }
-// if (figure?.color === playerSide) {
-    //   setMove(prev => prev.firstTap ? {...prev, secondTap: cell} : {...prev, firstTap: cell})
+
+//   let getFigureInCell = (x, y) => {
+//     // конкретная фигура {id, color, type}. если ничего вернет null
+//     }
+    
+//     // для ладьи
+//     let whereFigureCouldGo = (cell) => {
+//     let dots = []
+    
+//     // x+
+    // for(let i = cell.x + 1; i < 8; i++){
+    //   let figure = getFigureById(cell.figure)
+    //    if(figure?.color === playerSide)  
+        
+    //     dots.push(cell.id)
+    //    if(figure)
+    //       break;
     // }
+    
+//     //...
+    
+//     return dots
+//     }
 
+// let checkCell = (x, y, side, push) => {
+//   let figure = getFigureInCell (x, y)
+//    if(figure?.color === side)
+//       return false   
+    
+//    push({x, y})
+//    if(figure)
+//       return false;
+//    return true
+// }
 
+// // x+
+// for(let i = x + 1; i < maxW; i++){
+//    if(checkCell (i, y, side, dots.push))
+//       break;
+// }
 
-    console.log(cells)
-
-  // let findInCell = (x, y) => {
-  //   let foundFigureIdInCell = cells.find(f => x === f.x && y === f.y).figure
-  //   let figure = getFigureById(foundFigureIdInCell)
-  //   if(!foundFigureIdInCell) {
-  //     console.log('figure not found')
-  //   } else if (figure.color === playerSide) {
-  //     setCells(prev =>  
-  //     prev.map(el => (
-  //       {...el, activeCell: el.x == x && el.y == y ? true : false}
-  //     )
-  //       )
-  //     )
-         
-  //     let figure = figures.find(el => el.id === foundFigureIdInCell)
-  //   } 
-  // }
-
-// console.log(cells)
 
   return (
     <div className='d-flex justify-content-   w-100 border p-3 px-5'>
@@ -225,13 +261,13 @@ let changeFigurePosition = (foundFigId, cell) => {
                   key={cell.id}
                   className={getDeafultCellColor(cell.x, cell.y) + 
                     " opacity-75 d-flex justify-content-center align-items-center " + canActivateCell(cell) + " " + 
-                    (isCellFirstTap(cell) ? "activeCell" : "")}
+                    (isCellFirstTap(cell) ? "activeCell" : "") + (availableToMove.includes(cell.id) ? ' fa-solid fa-circle green-circle fs-4' : '')}
                   style={{ width: "4rem", height: "4rem" }}
                   onClick = {() => setM(cell)}
                 >
                   {cell.figure ?            
                     <div className = {`${renderFigure(cell.figure)} fs-1`}>
-                      <div className='fs-5'>{cell.figure}</div>
+                      {/* <div className='fs-5'>{cell.figure}</div> */}
                     </div>
                   : null}  
                 </div>
@@ -248,24 +284,30 @@ let changeFigurePosition = (foundFigId, cell) => {
       {/* historyBoard */}
       <div className='w-50 p-2'>
         <div className='w-100 h-100 '>
-          
-            <div className='bg-black opacity-75' style={{height:'16.6%'}} >
-              <div className={'p-3 w-50 fs-3 ' + (playerSide == 'black' ? 'playerTurn' : '')}>
+            <div className='bg-black opacity-75 text-white' style={{height:'16%'}}>
+              <div className='p-1 text-start d-flex'>
+                <div className='fa-solid fa-circle text-success pt-1'></div>
+                <div className='ps-1'>Player</div>
+                <div className='w-100 text-end pe-1'> 
+                  {playerSide == 'black' ? '<' : null} 
+                </div>
+              </div>
+              <div className={'p-2 w-50 fs-3 ' + (playerSide == 'black' ? 'playerTurn' : '')}>
                 --:--
               </div>
-            </div>
-         
+          </div>
          
           <div className='h-50 py-1'>
               <div className=' bg-brown h-100 p-2 text-start'>
                  {history.map((el, i) => (
-                    <div className='border-bottom text-white d-flex justify-content-'>
-                      <div>{i + 1}</div>
-                      <div className='w-50'>{el.id}</div>
-                      <div className='w-50'>{el.id}</div>
-                     
-                      {/* <span className=''> {el.id} </span> 
-                      <span className=''>{el.id}</span> */}
+                    <div className='border-bottom-brown text-white d-flex justify-content-'>
+                      <div className='px-2'>{i + 1}</div>
+                      <div className={`w-50 text-${el.figureColor}`}>
+                        <span className={renderFigure(el.firstTap?.figure)}></span>
+                        {el.firstTap?.id}
+                      </div>
+                      <div className={`w-50 text-${el.figureColor}`}>{el.secondTap?.id}</div>
+                      {/* <div className='w-50'>{el.id}</div> */}
                     </div>
                   )
                 )}
@@ -273,14 +315,18 @@ let changeFigurePosition = (foundFigId, cell) => {
           </div>
           <div style={{height:'16.6%'}} className='pb-1'>
             <div className='bg-brown h-100' >
-              
+              <div className='fs-2 text-white p-4'>
+                <i class="fa-solid fa-house pe-4"></i>   
+                <i class="fa-solid fa-flag fs-3"></i>
+                </div>
             </div>
           </div>
           <div className='bg-white' style={{height:'16%'}}>
             <div className='p-1 text-start d-flex'>
-              <div className='fa-solid fa-circle text-success'></div>
-              <div> Player</div>
-              {playerSide == 'white' ? '<' : null}
+              <div className='fa-solid fa-circle text-success pt-1'></div>
+              <div className='ps-1'>Player</div>
+              <div className='w-100 text-end pe-1'> 
+              {playerSide == 'white' ? '<' : null} </div>
             </div>
             <div className={'p-2 w-50 fs-3 ' + (playerSide == 'white' ? 'playerTurn' : '')}>
               --:--
