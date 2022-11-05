@@ -42,3 +42,9 @@
 .border-bottom-brown {
   border-bottom: 1px solid #9b7d71;
 }
+
+.figureShadow {
+  text-shadow: 0px 0px 5px black;
+  /* смещение-x | смещение-y | радиус-размытия | цвет */
+  /* 008 303 */
+}

@@ -15,7 +15,9 @@ const figureTypes =
   {
     value,
     icon: 'fa-solid fa-chess-' + value, 
-    // whereFigureCanGo: () => {} 
+    whereFigureCanGo: (cell, x, y) => {
+      let dots = []
+    } 
   }
   ))
 
@@ -28,8 +30,7 @@ const [figures, setFigures] = useState(Array.from({length: 32}, (el, i) => (
       id: i + 1,
       color: i < 16  ? 'black': 'white',
       type: ('rook ' + 'knight ' + 'bishop '  + 'queen ' + 'king ' + 'bishop ' + 'knight ' + 'rook ' + 'pawn '.repeat(8)).split(' ')[i % (maxBoardWidth * 2)], 
-     
-    icon: 'fa-solid fa-chess-' + 'pawn ',
+   
     }
   )
 ))  
@@ -87,14 +88,15 @@ let arrDefaultFigurePosition = [
 
 useEffect(() => {
   setDefaultFigurePosition(arrDefaultFigurePosition)
-  }, [])
+}, [])
 
   let getFigureById = (id) => figures.find(el => el.id == id)
 
-  let renderFigure = (id) => {
+  let renderFigure = (id, shadow) => {
   let figure = getFigureById(id)
     if (figure) {
       return figureTypes.find(it => it.value == figure.type).icon + ' text-' + figure.color 
+      + (figure.color == 'white' && shadow ? ' figureShadow' : '')
     }
     }
 
@@ -104,12 +106,21 @@ const [move, setMove] = useState({})
 
 const [history, setHistory] = useState([])
 
-let historyPush = (move) => setHistory(prev => 
-  // [...prev, {firstTap: move.firstTap, secondTap: move.secondTap, figureColor: playerSide}])
-  [...prev, {...move, figureColor: playerSide}])
-
+let historyPush = (move) => setHistory(prev => [...prev, {...move, figureColor: playerSide}])
+console.log(history)
 useEffect(() => {
   if(move.secondTap){
+    //   setCells((prev) => 
+    //   prev.map(el => {
+    //     if(el.id == move.firstTap.id) {
+    //       return {...el, figure: null}
+    //     } else {
+    //       return el
+    //     }
+        
+    //   }
+    //   ))
+    //  setAvailableToMove([])
     historyPush(move)
     setMove({})
     setPlayerSide(prev => prev == 'white' ? 'black' : 'white')
@@ -135,22 +146,197 @@ useEffect(() => {
     }
 }, [move])
 
-console.log(history)
 
-let changeFigurePosition = (foundFigId, cell) => {
-  setFigureInCell(foundFigId, cell.x, cell.y)
-  // console.log(cells)
-}
 
   const [availableToMove, setAvailableToMove] = useState([])
+  // это массив, в котором мы храним либо:
+  // айди Клеток
+  // либо х у клеток на которые можем пойти
+
   
-  let whereFigureCanGoo = [
-    {id: 'D2', dots: ['D3','D4']},
-    {id: 'C2', dots: ['C3','C4']},
-    {id: 'A2', dots: ['A3','A4']},
-    {id: 'C7', dots: ['C6','C5']},
-    {id: 'B8', dots: ['C6','A6']},
-  ]
+
+let knightMove = [
+  {xOffset: 2, yOffset: -1},
+  {xOffset: 2, yOffset: 1},
+  {xOffset: -2, yOffset: -1},
+  {xOffset: -2, yOffset: 1},
+  {xOffset: 1, yOffset: -2},
+  {xOffset: -1, yOffset: -2},
+  {xOffset: 1, yOffset: 2},
+  {xOffset: -1, yOffset: 2}
+]
+
+let bishopMove = [
+  // вверх вправо
+  {xOffset: 1, yOffset: 1},
+  {xOffset: 2, yOffset: 2},
+  {xOffset: 3, yOffset: 3},
+  {xOffset: 4, yOffset: 4},
+  {xOffset: 5, yOffset: 5},
+  {xOffset: 6, yOffset: 6},
+  {xOffset: 7, yOffset: 7},
+  // вверх влево
+  {xOffset: -1, yOffset: 1},
+  {xOffset: -2, yOffset: 2},
+  {xOffset: -3, yOffset: 3},
+  {xOffset: -4, yOffset: 4},
+  {xOffset: -5, yOffset: 5},
+  {xOffset: -6, yOffset: 6},
+  {xOffset: -7, yOffset: 7},
+  // вниз влево
+  {xOffset: -1, yOffset: -1},
+  {xOffset: -2, yOffset: -2},
+  {xOffset: -3, yOffset: -3},
+  {xOffset: -4, yOffset: -4},
+  {xOffset: -5, yOffset: -5},
+  {xOffset: -6, yOffset: -6},
+  {xOffset: -7, yOffset: -7},
+
+  // вниз вправо
+  {xOffset: 1, yOffset: -1},
+  {xOffset: 2, yOffset: -2},
+  {xOffset: 3, yOffset: -3},
+  {xOffset: 4, yOffset: -4},
+  {xOffset: 5, yOffset: -5},
+  {xOffset: 6, yOffset: -6},
+  {xOffset: 7, yOffset: -7},
+
+]
+
+let rookMove = [
+  // вверх
+  {xOffset: 0, yOffset: 1},
+  {xOffset: 0, yOffset: 2},
+  {xOffset: 0, yOffset: 3},
+  {xOffset: 0, yOffset: 4},
+  {xOffset: 0, yOffset: 5},
+  {xOffset: 0, yOffset: 6},
+  {xOffset: 0, yOffset: 7},
+  // вправо
+  {xOffset: 1, yOffset: 0},
+  {xOffset: 2, yOffset: 0},
+  {xOffset: 3, yOffset: 0},
+  {xOffset: 4, yOffset: 0},
+  {xOffset: 5, yOffset: 0},
+  {xOffset: 6, yOffset: 0},
+  {xOffset: 7, yOffset: 0},
+   // влево
+   {xOffset: -1, yOffset: 0},
+   {xOffset: -2, yOffset: 0},
+   {xOffset: -3, yOffset: 0},
+   {xOffset: -4, yOffset: 0},
+   {xOffset: -5, yOffset: 0},
+   {xOffset: -6, yOffset: 0},
+   {xOffset: -7, yOffset: 0},
+  // вниз
+  {xOffset: 0, yOffset: -1},
+  {xOffset: 0, yOffset: -2},
+  {xOffset: 0, yOffset: -3},
+  {xOffset: 0, yOffset: -4},
+  {xOffset: 0, yOffset: -5},
+  {xOffset: 0, yOffset: -6},
+  {xOffset: 0, yOffset: -7},
+
+  
+]
+
+  let whereFigureCouldGo = (figure, cell) => {
+    let dots = []
+    let foundCell;
+    if(figure?.type == 'pawn' && figure.color == 'white') {
+      for(let i = cell.y + 1; i < 4; i++) {
+        foundCell = cells.find(el => el.y == i && el.x == cell.x)?.id
+          dots.push(foundCell)
+      }
+    } else if(figure?.type == 'pawn' && figure.color == 'black') {
+      for(let i = cell.y - 1; i > 3; i--) {
+        foundCell = cells.find(el => el.y == i && el.x == cell.x)?.id
+          dots.push(foundCell)
+      } 
+    } else if(figure?.type == 'knight') {
+      knightMove.map(it => {
+        foundCell = cells.find(el => el.y == cell.y + it.yOffset && el.x == cell.x + it.xOffset)?.id
+        dots.push(( foundCell ))
+      }
+        )
+    } else if(figure?.type == 'bishop') {
+          // x+, y+
+          for(let i = 1; i < 8; i++) {
+            foundCell = cells.find(el => el.y == cell.y + i && el.x == cell.x + i)?.id
+            dots.push(( foundCell ))
+          }
+          // x-, y-
+          for(let i = 7; i > 0; i--) {
+            foundCell = cells.find(el => el.y == cell.y - i && el.x == cell.x - i)?.id
+            dots.push(( foundCell ))
+          }
+          // x-, y+
+          for(let i = 1; i < 8; i++) {
+            foundCell = cells.find(el => el.y == cell.y + i && el.x == cell.x - i)?.id
+            dots.push(( foundCell ))
+          }
+          // x+, y-
+          for(let i = 7; i > 0; i--) {
+            foundCell = cells.find(el => el.y == cell.y - i && el.x == cell.x + i)?.id
+            dots.push(( foundCell ))
+          }
+
+      // bishopMove.map(it => {
+      //   foundCell = cells.find(el => el.y == cell.y + it.yOffset && el.x == cell.x + it.xOffset)?.id
+      //   dots.push(( foundCell ))
+      // }
+      //   )
+    } else if (figure?.type == 'rook') {
+        // x0, y+ вверх
+        for(let i = cell.y + 1; i < 8; i++) {
+          foundCell = cells.find(el => el.y ==  i && el.x == cell.x)?.id
+          dots.push(( foundCell ))
+        }
+        // x0, y- вниз
+        for(let i = cell.y - 1; i >= 0; i--) {
+          foundCell = cells.find(el => el.y == i && el.x == cell.x)?.id
+          dots.push(( foundCell ))
+        }
+        // x+, y0 вправо
+        for(let i = cell.x + 1; i < 8; i++) {
+          foundCell = cells.find(el => el.y == cell.y && el.x == i)?.id
+          dots.push(( foundCell ))
+        }
+        // x-, y0 влево
+        for(let i = cell.x - 1; i >= 0; i--) {
+          foundCell = cells.find(el => el.y == cell.y && el.x == i)?.id
+          dots.push(( foundCell ))
+        }
+        
+    } 
+// конь
+    //   //вправо вверх
+    //   foundCell = cells.find(el => el.y == cell.y + 2 && el.x == cell.x - 1)?.id
+    //   dots.push(( foundCell ))
+    //   // влево вверх
+    //   foundCell = cells.find(el => el.y == cell.y + 2 && el.x == cell.x + 1)?.id
+    //      dots.push(( foundCell ))
+    //   // вниз влево
+    //      foundCell = cells.find(el => el.y == cell.y - 2 && el.x == cell.x - 1)?.id
+    //      dots.push(( foundCell ))
+    //   // вниз вправо
+    //      foundCell = cells.find(el => el.y == cell.y - 2 && el.x == cell.x + 1)?.id
+    //      dots.push(( foundCell ))
+    //   // влево вверх
+    //   foundCell = cells.find(el => el.y == cell.y + 1 && el.x == cell.x - 2)?.id
+    //      dots.push(( foundCell ))
+    //      // влево вниз
+    //   foundCell = cells.find(el => el.y == cell.y - 1 && el.x == cell.x - 2)?.id
+    //   dots.push(( foundCell ))
+    //    // вправо вверх
+    //    foundCell = cells.find(el => el.y == cell.y + 1 && el.x == cell.x + 2)?.id
+    //    dots.push(( foundCell ))
+    //    // вправо вниз
+    // foundCell = cells.find(el => el.y == cell.y - 1 && el.x == cell.x + 2)?.id
+    // dots.push(( foundCell ))
+    
+    return dots;
+    }
 
   let isCellFirstTap = cell => (cell.id == move.firstTap?.id) 
 
@@ -159,6 +345,13 @@ let changeFigurePosition = (foundFigId, cell) => {
     return (figure?.color == playerSide && !isCellFirstTap(cell) ? 'cellOnFocus' : null) 
   }
 
+
+  
+let changeFigurePosition = (foundFigId, cell) => {
+  setFigureInCell(foundFigId, cell.x, cell.y)
+
+}
+
   let setM = (cell) => {
     let figure = getFigureById(cell.figure)
 
@@ -166,12 +359,13 @@ let changeFigurePosition = (foundFigId, cell) => {
 
       setMove(prev => ({...prev, firstTap: cell}))
 
-      let canGo = whereFigureCanGoo.find(el => el.id === cell.id)
-      setAvailableToMove([...canGo.dots])
+      let dots = whereFigureCouldGo(figure, cell)
+
+      setAvailableToMove([...dots])
 
     } else if (availableToMove.includes(cell.id)) {
-    // (availableToMove.find(el => el.dots.includes(cell.id) && el.type == figure.type)) {
       setMove(prev => ({...prev, secondTap: cell}))
+      // changeFigurePosition(move.firstTap.figure, move.secondTap.x, move.secondTap.y)
       setFigureInCell(move.firstTap.figure, cell.x, cell.y)
       setCells((prev) => 
       prev.map(el => {
@@ -183,56 +377,27 @@ let changeFigurePosition = (foundFigId, cell) => {
         
       }
       ))
-      
-    // setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
-    setAvailableToMove([])
+     setAvailableToMove([])
     }
   }
 
-//   let getFigureInCell = (x, y) => {
-//     // конкретная фигура {id, color, type}. если ничего вернет null
-//     }
-    
-//     // для ладьи
-//     let whereFigureCouldGo = (cell) => {
-//     let dots = []
-    
-//     // x+
-    // for(let i = cell.x + 1; i < 8; i++){
-    //   let figure = getFigureById(cell.figure)
-    //    if(figure?.color === playerSide)  
-        
-    //     dots.push(cell.id)
-    //    if(figure)
-    //       break;
-    // }
-    
-//     //...
-    
-//     return dots
-//     }
 
-// let checkCell = (x, y, side, push) => {
-//   let figure = getFigureInCell (x, y)
-//    if(figure?.color === side)
-//       return false   
-    
-//    push({x, y})
-//    if(figure)
-//       return false;
-//    return true
-// }
 
-// // x+
-// for(let i = x + 1; i < maxW; i++){
-//    if(checkCell (i, y, side, dots.push))
-//       break;
-// }
 
+
+  
 
   return (
-    <div className='d-flex justify-content-   w-100 border p-3 px-5'>
-      <div className=' w-50 p-2'><div className='border w-100 h-100'></div></div>
+    <div className='d-flex justify-content-  w-100 border p-3 px-5'>
+      <div className=' w-50 p-2'>
+        <div className=' w-100 h-100'>
+          <div className='w-100 bg-brown opacity-75 p-3 text-light'>
+            <div>Матч</div>
+            <div>{Math.floor(Math.random() * 10000000)}</div>
+          </div>
+        </div>
+        
+      </div>
       <div className='w-75 p-2'> 
         <div
           style={{ width: '550px', backgroundColor: '#fede97' }}
@@ -264,11 +429,12 @@ let changeFigurePosition = (foundFigId, cell) => {
                     (isCellFirstTap(cell) ? "activeCell" : "") + (availableToMove.includes(cell.id) ? ' fa-solid fa-circle green-circle fs-4' : '')}
                   style={{ width: "4rem", height: "4rem" }}
                   onClick = {() => setM(cell)}
-                >
+                > 
+                {/* {cell.x} */}
                   {cell.figure ?            
-                    <div className = {`${renderFigure(cell.figure)} fs-1`}>
+                    <div className = {`${renderFigure(cell.figure, 'shadow')} fs-1 position-absolute`}>
                       {/* <div className='fs-5'>{cell.figure}</div> */}
-                    </div>
+                    </div> 
                   : null}  
                 </div>
               ))
@@ -283,7 +449,7 @@ let changeFigurePosition = (foundFigId, cell) => {
       </div>
       {/* historyBoard */}
       <div className='w-50 p-2'>
-        <div className='w-100 h-100 '>
+        <div className='w-100 h-100'>
             <div className='bg-black opacity-75 text-white' style={{height:'16%'}}>
               <div className='p-1 text-start d-flex'>
                 <div className='fa-solid fa-circle text-success pt-1'></div>
@@ -298,20 +464,19 @@ let changeFigurePosition = (foundFigId, cell) => {
           </div>
          
           <div className='h-50 py-1'>
-              <div className=' bg-brown h-100 p-2 text-start'>
-                 {history.map((el, i) => (
-                    <div className='border-bottom-brown text-white d-flex justify-content-'>
-                      <div className='px-2'>{i + 1}</div>
-                      <div className={`w-50 text-${el.figureColor}`}>
-                        <span className={renderFigure(el.firstTap?.figure)}></span>
-                        {el.firstTap?.id}
-                      </div>
-                      <div className={`w-50 text-${el.figureColor}`}>{el.secondTap?.id}</div>
-                      {/* <div className='w-50'>{el.id}</div> */}
-                    </div>
-                  )
-                )}
-              </div>
+            <div className=' bg-brown h-100 py-2 px-3 text-center'>
+              {history.map((el, i) => (
+                <div className='border-bottom-brown text-white row'>
+                  <div className='px-2 col-2 '>{i + 1}</div>
+                  <div className={`w-50 text-${el.figureColor} col `}>
+                    <span className={renderFigure(el.firstTap?.figure) + ' px-1'}></span>
+                    {el.firstTap?.id}
+                  </div>
+                  <div className={`w-50 text-${el.figureColor} col  `}>{el.secondTap?.id}</div>
+                </div>
+              )
+            )}
+            </div>
           </div>
           <div style={{height:'16.6%'}} className='pb-1'>
             <div className='bg-brown h-100' >
