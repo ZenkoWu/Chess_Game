@@ -35,6 +35,9 @@
   color: rgba(100, 148, 78);
 }
 
+.red-circle {
+  color: rgb(255, 2, 2);
+}
 .activeCell{
   background-color: rgb(81, 136, 55);
 }
