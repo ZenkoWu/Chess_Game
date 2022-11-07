@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 export default function ChessBoard() {
+
+
   const maxBoardWidth = 8;
 
   const maxBoardHeight = 8;
@@ -490,10 +492,9 @@ export default function ChessBoard() {
         if (figureInCell) {
           let figureColor = figures.find((fig) => fig.id == figureInCell).color;
 
-          if (figureColor == "black") {
+          if (figureColor !== playerSide) {
             setEnemyFig((prev) => [...prev, figureInCell]);
             enemyFig2.push(figureInCell);
-
             //  console.log(enemyFig2)
           }
         }
@@ -504,12 +505,11 @@ export default function ChessBoard() {
       let figureInCell;
 
       // x0, y+ вверх
-
       for (let i = cell.y + 1; i < 8; i++) {
         figureInCell = checkFigureInCell(cell.x, i);
 
         if (figureInCell) {
-          if (enemyFig.includes(figureInCell)) {
+          if (enemyFig2.includes(figureInCell)) {
             dots.push(foundCellForMove(cell.x, i));
           }
 
@@ -517,35 +517,25 @@ export default function ChessBoard() {
         }
         dots.push(foundCellForMove(cell.x, i));
       }
+
       // x0, y- вниз
-
       for (let i = cell.y - 1; i >= 0; i--) {
-        foundCell = foundCellForMove(cell.x, i);
-
-        dots.push(foundCell);
+        dots.push(foundCellForMove(cell.x, i));
       }
 
       // x+, y0 вправо
-
       for (let i = cell.x + 1; i < 8; i++) {
-        foundCell = foundCellForMove(i, cell.y);
-
-        dots.push(foundCell);
+        dots.push(foundCellForMove(i, cell.y));
       }
 
       // x-, y0 влево
-
       for (let i = cell.x - 1; i >= 0; i--) {
-        foundCell = foundCellForMove(i, cell.y);
-
-        dots.push(foundCell);
+        dots.push(foundCellForMove(i, cell.y));
       }
     }
 
     // конь
-
     //   //вправо вверх
-
     //   foundCell = cells.find(el => el.y == cell.y + 2 && el.x == cell.x - 1)?.id
 
     //   dots.push(( foundCell ))
@@ -601,10 +591,7 @@ export default function ChessBoard() {
 
   let canActivateCell = (cell) => {
     let figure = getFigureById(cell.figure);
-
-    return figure?.color == playerSide && !isCellFirstTap(cell)
-      ? "cellOnFocus"
-      : null;
+    return figure?.color == playerSide && !isCellFirstTap(cell) ? "cellOnFocus" : null;
   };
 
   // let changeFigurePosition = (foundFigId, cell) => {
@@ -647,7 +634,7 @@ export default function ChessBoard() {
   console.log(enemyFig2);
 
   return (
-    <div className="d-flex justify-content-  w-100 border p-3 px-5">
+    <div className="d-flex justify-content-  w-100  p-2 px-5">
       <div className=" w-50 p-2">
         <div className=" w-100 h-100">
           <div className="w-100 bg-brown opacity-75 p-3 text-light">
@@ -695,10 +682,10 @@ export default function ChessBoard() {
                   canActivateCell(cell) +
                   " " +
                   (isCellFirstTap(cell) ? "activeCell" : "") +
-                  (availableToMove.includes(cell.id)
+                  (availableToMove.includes(cell.id) && !enemyFig.includes(cell.figure)
                     ? " fa-solid fa-circle green-circle fs-4"
                     : enemyFig.includes(cell.figure)
-                    ? " fa-regular fa-circle red-circle fs-4"
+                    ? " fa-regular fa-circle green-circle fs-1 "
                     : "")
                 }
                 style={{ width: "4rem", height: "4rem" }}
@@ -708,10 +695,7 @@ export default function ChessBoard() {
 
                 {cell.figure ? (
                   <div
-                    className={`${renderFigure(
-                      cell.figure,
-                      "shadow"
-                    )} fs-1 position-absolute`}
+                    className={`${renderFigure(cell.figure, "shadow")} fs-1 position-absolute`}
                   >
                     {/* <div className='fs-5'>{cell.figure}</div> */}
                   </div>
@@ -736,10 +720,10 @@ export default function ChessBoard() {
         <div className="w-100 h-100">
           <div
             className="bg-black opacity-75 text-white"
-            style={{ height: "16%" }}
+            style={{ height: "15%" }}
           >
             <div className="p-1 text-start d-flex">
-              <div className="fa-solid fa-circle text-success pt-1"></div>
+              <i className="fa-solid fa-circle text-success pt-1"></i>
 
               <div className="ps-1">Player</div>
 
@@ -750,15 +734,15 @@ export default function ChessBoard() {
 
             <div
               className={
-                "p-2 w-50 fs-3 " + (playerSide == "black" ? "playerTurn" : "")
+                "p-2 w-50 fs-4 " + (playerSide == "black" ? "playerTurn" : "")
               }
             >
               --:--
             </div>
           </div>
 
-          <div className="h-50 py-1">
-            <div className=" bg-brown h-100 py-2 px-3 text-center">
+          <div className=" py-1 ">
+            <div className=" bg-brown py-2 px-3 text-center " style={{overflow: 'auto', height:'300px' }} id= 'myDiv'>
               {history.map((el, i) => (
                 <div className="border-bottom-brown text-white row">
                   <div className="px-2 col-2 ">{i + 1}</div>
@@ -779,33 +763,26 @@ export default function ChessBoard() {
             </div>
           </div>
 
-          <div style={{ height: "16.6%" }} className="pb-1">
+          <div style={{ height: "15%" }} className="pb-1">
             <div className="bg-brown h-100">
-              <div className="fs-2 text-white p-4">
+              <div className="fs-2 text-white p-3">
                 <i class="fa-solid fa-house pe-4"></i>
-
                 <i class="fa-solid fa-flag fs-3"></i>
               </div>
             </div>
           </div>
 
-          <div className="bg-white" style={{ height: "16%" }}>
+          <div className="bg-white" style={{ height: "15%" }}>
             <div className="p-1 text-start d-flex">
               <div className="fa-solid fa-circle text-success pt-1"></div>
-
               <div className="ps-1">Player</div>
-
               <div className="w-100 text-end pe-1">
                 {playerSide == "white" ? "<" : null}{" "}
               </div>
             </div>
 
-            <div
-              className={
-                "p-2 w-50 fs-3 " + (playerSide == "white" ? "playerTurn" : "")
-              }
-            >
-              --:--
+            <div className={"p-2 w-50 fs-4 " + (playerSide == "white" ? "playerTurn" : "")}>
+               --:--
             </div>
           </div>
         </div>
@@ -813,3 +790,7 @@ export default function ChessBoard() {
     </div>
   );
 }
+
+
+// let d = document.getElementById("myDiv");
+// d.scrollTop = '270px'
