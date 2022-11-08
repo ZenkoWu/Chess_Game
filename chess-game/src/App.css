@@ -33,10 +33,12 @@
 
 .green-circle {
   color: rgba(100, 148, 78);
+  
 }
 
 .red-circle {
-  color: rgb(255, 2, 2);
+  /* color: rgb(255, 2, 2); */
+  background-color: rgba(91, 167, 73, 0.719);
 }
 .activeCell{
   background-color: rgb(81, 136, 55);
@@ -51,3 +53,4 @@
   /* смещение-x | смещение-y | радиус-размытия | цвет */
   /* 008 303 */
 }
+

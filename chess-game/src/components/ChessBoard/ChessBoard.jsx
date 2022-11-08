@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import sword from '.././../imgs/sword-svgrepo-com.svg'
 
 export default function ChessBoard() {
 
@@ -30,11 +31,7 @@ export default function ChessBoard() {
     })
   );
 
-  // let whereFigureCanGo = [
 
-  //   {type:'pawn', x: '', y: 1 || 2, color: ''}
-
-  // ]
 
   const [figures, setFigures] = useState(
     Array.from({ length: 32 }, (el, i) => ({
@@ -164,7 +161,7 @@ export default function ChessBoard() {
     setMatchNumber(Math.floor(Math.random() * 10000000));
   }, []);
 
-  let getFigureById = (id) => figures.find((el) => el.id == id);
+  let getFigureById = (id) => figures.find((el) => el.id === id);
 
   let renderFigure = (id, shadow) => {
     let figure = getFigureById(id);
@@ -190,6 +187,7 @@ export default function ChessBoard() {
 
   useEffect(() => {
     if (move.secondTap) {
+      
       //   setCells((prev) =>
 
       //   prev.map(el => {
@@ -211,6 +209,9 @@ export default function ChessBoard() {
       //  setAvailableToMove([])
 
       historyPush(move);
+        
+        // setKilledFigure(prev => [...prev, move.secondTap.figure]) 
+        
       setMove({});
       // setPlayerSide(prev => prev == 'white' ? 'black' : 'white')
 
@@ -600,6 +601,8 @@ export default function ChessBoard() {
 
   // }
 
+  let [killedFigure, setKilledFigure] = useState([])
+
   let setM = (cell) => {
     let figure = getFigureById(cell.figure);
 
@@ -613,7 +616,7 @@ export default function ChessBoard() {
       setMove((prev) => ({ ...prev, secondTap: cell }));
 
       // changeFigurePosition(move.firstTap.figure, move.secondTap.x, move.secondTap.y)
-
+      
       setFigureInCell(move.firstTap.figure, cell.x, cell.y);
 
       setCells((prev) =>
@@ -627,11 +630,26 @@ export default function ChessBoard() {
       );
 
       setAvailableToMove([]);
+
+        
+        // enemyFig.map(figid => 
+        //   {
+        //     let cell = cells.find(c => c.figure == figid).figure
+            
+        //     if (cell == figid) {
+        //       setKilledFigure(prev => [...prev, figid])
+        //     }
+        //   }
+        //   )
+        
+
+     
       setEnemyFig([]);
     }
   };
 
-  console.log(enemyFig2);
+  console.log(enemyFig);
+  console.log(history);
 
   return (
     <div className="d-flex justify-content-  w-100  p-2 px-5">
@@ -685,14 +703,21 @@ export default function ChessBoard() {
                   (availableToMove.includes(cell.id) && !enemyFig.includes(cell.figure)
                     ? " fa-solid fa-circle green-circle fs-4"
                     : enemyFig.includes(cell.figure)
-                    ? " fa-regular fa-circle green-circle fs-1 "
+                    ? '  red-circle '
+                    // " fa-regular fa-circle green-circle fs-1 "
                     : "")
                 }
                 style={{ width: "4rem", height: "4rem" }}
                 onClick={() => setM(cell)}
               >
                 {/* {cell.x} */}
-
+                {
+                   enemyFig.includes(cell.figure)
+                   ? 
+                  
+                  <img src={sword} alt="" width='50px' style={{}}/>
+                  : ""
+                }
                 {cell.figure ? (
                   <div
                     className={`${renderFigure(cell.figure, "shadow")} fs-1 position-absolute`}
@@ -731,14 +756,20 @@ export default function ChessBoard() {
                 {playerSide == "black" ? "<" : null}
               </div>
             </div>
-
-            <div
-              className={
-                "p-2 w-50 fs-4 " + (playerSide == "black" ? "playerTurn" : "")
-              }
-            >
-              --:--
-            </div>
+            <div className="d-flex">
+              <div className={"p-2 w-50 fs-4 " + (playerSide == "black" ? "playerTurn" : "")}>
+                --:--
+              </div>
+              <div className=" text-start ps-2 w-50  ">{
+                  history.map(el =>(
+                    el.secondTap?.figure && el.figureColor == 'black'
+                     ?
+                    <i className={(renderFigure(el.secondTap?.figure)) + ' pe-1 '}></i>
+                     : null
+                    ) 
+                  )
+                }</div>
+              </div>
           </div>
 
           <div className=" py-1 ">
@@ -756,6 +787,12 @@ export default function ChessBoard() {
                   </div>
 
                   <div className={`w-50 text-${el.figureColor} col  `}>
+                    {el.secondTap?.figure ? 
+                      <i
+                      className={renderFigure(el.secondTap?.figure) + " px-1 "}
+                    ></i>
+                    : null
+                    }
                     {el.secondTap?.id}
                   </div>
                 </div>
@@ -772,17 +809,26 @@ export default function ChessBoard() {
             </div>
           </div>
 
-          <div className="bg-white" style={{ height: "15%" }}>
+          <div className="bg-white " style={{ height: "15%" }}>
             <div className="p-1 text-start d-flex">
               <div className="fa-solid fa-circle text-success pt-1"></div>
-              <div className="ps-1">Player</div>
+              <div className="ps-1 ">Player</div>
               <div className="w-100 text-end pe-1">
                 {playerSide == "white" ? "<" : null}{" "}
               </div>
             </div>
-
-            <div className={"p-2 w-50 fs-4 " + (playerSide == "white" ? "playerTurn" : "")}>
-               --:--
+            <div className="d-flex ">
+              <div className={"p-2 w-50 fs-4  " + (playerSide == "white" ? "playerTurn" : "")}>
+                --:--
+              </div>
+              <div className="text-start ps-1 w-50  ">{
+                history.map(el => (
+                   el.secondTap?.figure && el.figureColor == 'white' ?
+                  <i className={(renderFigure(el.secondTap?.figure)) + ' pe-1'}></i>
+                   : null
+                  )
+                  )
+              }</div>
             </div>
           </div>
         </div>
