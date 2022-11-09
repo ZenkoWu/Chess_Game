@@ -3,11 +3,8 @@ import sword from '.././../imgs/sword-svgrepo-com.svg'
 
 export default function ChessBoard() {
 
-
   const maxBoardWidth = 8;
-
   const maxBoardHeight = 8;
-
   const letterACodeInASCII = 65;
 
   let numbersAxis = Array.from(
@@ -22,23 +19,15 @@ export default function ChessBoard() {
   const figureTypes = ["king", "queen", "knight", "bishop", "rook", "pawn"].map(
     (value) => ({
       value,
-
       icon: "fa-solid fa-chess-" + value,
-
-      whereFigureCanGo: (cell, x, y) => {
-        let dots = [];
-      },
     })
   );
-
 
 
   const [figures, setFigures] = useState(
     Array.from({ length: 32 }, (el, i) => ({
       id: i + 1,
-
       color: i < 16 ? "black" : "white",
-
       type: (
         "rook " +
         "knight " +
@@ -58,11 +47,8 @@ export default function ChessBoard() {
       id:
         lettersAxis[i % maxBoardWidth] +
         numbersAxis[Math.floor(i / maxBoardHeight) % maxBoardHeight],
-
       figure: null,
-
       x: i % maxBoardWidth,
-
       y: maxBoardHeight - 1 - (Math.floor(i / maxBoardHeight) % maxBoardHeight),
     }))
   );
@@ -105,60 +91,26 @@ export default function ChessBoard() {
 
   let arrDefaultFigurePosition = [
     { start: 0, xOffsetBetweenFigures: 1, type: "pawn", color: "black", y: 6 },
-
     { start: 0, xOffsetBetweenFigures: 1, type: "pawn", color: "white", y: 1 },
-
     { start: 4, xOffsetBetweenFigures: 4, type: "king", color: "black", y: 7 },
-
     { start: 4, xOffsetBetweenFigures: 4, type: "king", color: "white", y: 0 },
-
     { start: 3, xOffsetBetweenFigures: 5, type: "queen", color: "black", y: 7 },
-
     { start: 3, xOffsetBetweenFigures: 5, type: "queen", color: "white", y: 0 },
-
-    {
-      start: 1,
-      xOffsetBetweenFigures: 5,
-      type: "knight",
-      color: "black",
-      y: 7,
-    },
-
-    {
-      start: 1,
-      xOffsetBetweenFigures: 5,
-      type: "knight",
-      color: "white",
-      y: 0,
-    },
-
-    {
-      start: 2,
-      xOffsetBetweenFigures: 3,
-      type: "bishop",
-      color: "black",
-      y: 7,
-    },
-
-    {
-      start: 2,
-      xOffsetBetweenFigures: 3,
-      type: "bishop",
-      color: "white",
-      y: 0,
-    },
-
+    { start: 1, xOffsetBetweenFigures: 5, type: "knight", color: "black", y: 7 }, 
+    { start: 1, xOffsetBetweenFigures: 5, type: "knight", color: "white", y: 0 },
+    { start: 2, xOffsetBetweenFigures: 3, type: "bishop", color: "black", y: 7 },
+    { start: 2, xOffsetBetweenFigures: 3,  type: "bishop", color: "white", y: 0 },
     { start: 0, xOffsetBetweenFigures: 7, type: "rook", color: "black", y: 7 },
-
     { start: 0, xOffsetBetweenFigures: 7, type: "rook", color: "white", y: 0 },
   ];
 
   let [matchNumber, setMatchNumber] = useState(1);
 
   useEffect(() => {
-    setDefaultFigurePosition(arrDefaultFigurePosition);
 
+    setDefaultFigurePosition(arrDefaultFigurePosition);
     setMatchNumber(Math.floor(Math.random() * 10000000));
+
   }, []);
 
   let getFigureById = (id) => figures.find((el) => el.id === id);
@@ -174,6 +126,7 @@ export default function ChessBoard() {
         (figure.color == "white" && shadow ? " figureShadow" : "")
       );
     }
+
   };
 
   const [playerSide, setPlayerSide] = useState("white");
@@ -182,12 +135,15 @@ export default function ChessBoard() {
 
   const [history, setHistory] = useState([]);
 
-  let historyPush = (move) =>
-    setHistory((prev) => [...prev, { ...move, figureColor: playerSide }]);
+  let historyPush = (move) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide }]);
+
 
   useEffect(() => {
     if (move.secondTap) {
       
+
+      // setAvailableToMove([]);
+
       //   setCells((prev) =>
 
       //   prev.map(el => {
@@ -208,9 +164,8 @@ export default function ChessBoard() {
 
       //  setAvailableToMove([])
 
+
       historyPush(move);
-        
-        // setKilledFigure(prev => [...prev, move.secondTap.figure]) 
         
       setMove({});
       // setPlayerSide(prev => prev == 'white' ? 'black' : 'white')
@@ -237,356 +192,227 @@ export default function ChessBoard() {
 
       // setFigureInCell(figId, x, y)
 
-      // move and save
-
-      // изменяем положение фигуры в соответствие с выбранной клеткой через функцию сетфигурпозишн
-
-      // сохраняем второй тап или весь мув в историю через хистори пуш (решить как отображать историю из массива)
-
-      // обновляем setMove({})
-
-      // через setPlayerSide меняем игрока на противоположный не на конкретный
     } else if (move.firstTap) {
       // count where we can go
     }
   }, [move]);
 
+
   const [availableToMove, setAvailableToMove] = useState([]);
 
-  // это массив, в котором мы храним либо:
-
-  // айди Клеток
-
-  // либо х у клеток на которые можем пойти
-
-  let knightMove = [
-    { xOffset: 2, yOffset: -1 },
-
-    { xOffset: 2, yOffset: 1 },
-
-    { xOffset: -2, yOffset: -1 },
-
-    { xOffset: -2, yOffset: 1 },
-
-    { xOffset: 1, yOffset: -2 },
-
-    { xOffset: -1, yOffset: -2 },
-
-    { xOffset: 1, yOffset: 2 },
-
-    { xOffset: -1, yOffset: 2 },
-  ];
-
-  let bishopMove = [
-    // вверх вправо
-
-    { xOffset: 1, yOffset: 1 },
-
-    { xOffset: 2, yOffset: 2 },
-
-    { xOffset: 3, yOffset: 3 },
-
-    { xOffset: 4, yOffset: 4 },
-
-    { xOffset: 5, yOffset: 5 },
-
-    { xOffset: 6, yOffset: 6 },
-
-    { xOffset: 7, yOffset: 7 },
-
-    // вверх влево
-
-    { xOffset: -1, yOffset: 1 },
-
-    { xOffset: -2, yOffset: 2 },
-
-    { xOffset: -3, yOffset: 3 },
-
-    { xOffset: -4, yOffset: 4 },
-
-    { xOffset: -5, yOffset: 5 },
-
-    { xOffset: -6, yOffset: 6 },
-
-    { xOffset: -7, yOffset: 7 },
-
-    // вниз влево
-
-    { xOffset: -1, yOffset: -1 },
-
-    { xOffset: -2, yOffset: -2 },
-
-    { xOffset: -3, yOffset: -3 },
-
-    { xOffset: -4, yOffset: -4 },
-
-    { xOffset: -5, yOffset: -5 },
-
-    { xOffset: -6, yOffset: -6 },
-
-    { xOffset: -7, yOffset: -7 },
-
-    // вниз вправо
-
-    { xOffset: 1, yOffset: -1 },
-
-    { xOffset: 2, yOffset: -2 },
-
-    { xOffset: 3, yOffset: -3 },
-
-    { xOffset: 4, yOffset: -4 },
-
-    { xOffset: 5, yOffset: -5 },
-
-    { xOffset: 6, yOffset: -6 },
-
-    { xOffset: 7, yOffset: -7 },
-  ];
-
-  let rookMove = [
-    // вверх
-
-    { xOffset: 0, yOffset: 1 },
-
-    { xOffset: 0, yOffset: 2 },
-
-    { xOffset: 0, yOffset: 3 },
-
-    { xOffset: 0, yOffset: 4 },
-
-    { xOffset: 0, yOffset: 5 },
-
-    { xOffset: 0, yOffset: 6 },
-
-    { xOffset: 0, yOffset: 7 },
-
-    // вправо
-
-    { xOffset: 1, yOffset: 0 },
-
-    { xOffset: 2, yOffset: 0 },
-
-    { xOffset: 3, yOffset: 0 },
-
-    { xOffset: 4, yOffset: 0 },
-
-    { xOffset: 5, yOffset: 0 },
-
-    { xOffset: 6, yOffset: 0 },
-
-    { xOffset: 7, yOffset: 0 },
-
-    // влево
-
-    { xOffset: -1, yOffset: 0 },
-
-    { xOffset: -2, yOffset: 0 },
-
-    { xOffset: -3, yOffset: 0 },
-
-    { xOffset: -4, yOffset: 0 },
-
-    { xOffset: -5, yOffset: 0 },
-
-    { xOffset: -6, yOffset: 0 },
-
-    { xOffset: -7, yOffset: 0 },
-
-    // вниз
-
-    { xOffset: 0, yOffset: -1 },
-
-    { xOffset: 0, yOffset: -2 },
-
-    { xOffset: 0, yOffset: -3 },
-
-    { xOffset: 0, yOffset: -4 },
-
-    { xOffset: 0, yOffset: -5 },
-
-    { xOffset: 0, yOffset: -6 },
-
-    { xOffset: 0, yOffset: -7 },
-  ];
-
-  let [enemyFig, setEnemyFig] = useState([]);
-
-  let enemyFig2 = [];
+  // let knightMove = [
+  //   { xOffset: 2, yOffset: -1 },
+  //   { xOffset: 2, yOffset: 1 },
+  //   { xOffset: -2, yOffset: -1 },
+  //   { xOffset: -2, yOffset: 1 },
+  //   { xOffset: 1, yOffset: -2 },
+  //   { xOffset: -1, yOffset: -2 },
+  //   { xOffset: 1, yOffset: 2 },
+  //   { xOffset: -1, yOffset: 2 },
+  // ];
+
+  // let bishopMove = [
+  //   // вверх вправо
+
+  //   { xOffset: 1, yOffset: 1 },
+  //   { xOffset: 2, yOffset: 2 },
+  //   { xOffset: 3, yOffset: 3 },
+  //   { xOffset: 4, yOffset: 4 },
+  //   { xOffset: 5, yOffset: 5 },
+  //   { xOffset: 6, yOffset: 6 },
+  //   { xOffset: 7, yOffset: 7 },
+
+  //   // вверх влево
+
+  //   { xOffset: -1, yOffset: 1 },
+  //   { xOffset: -2, yOffset: 2 },
+  //   { xOffset: -3, yOffset: 3 },
+  //   { xOffset: -4, yOffset: 4 },
+  //   { xOffset: -5, yOffset: 5 },
+  //   { xOffset: -6, yOffset: 6 },
+  //   { xOffset: -7, yOffset: 7 },
+
+  //   // вниз влево
+
+  //   { xOffset: -1, yOffset: -1 },
+  //   { xOffset: -2, yOffset: -2 },
+  //   { xOffset: -3, yOffset: -3 },
+  //   { xOffset: -4, yOffset: -4 },
+  //   { xOffset: -5, yOffset: -5 },
+  //   { xOffset: -6, yOffset: -6 },
+  //   { xOffset: -7, yOffset: -7 },
+
+  //   // вниз вправо
+
+  //   { xOffset: 1, yOffset: -1 },
+  //   { xOffset: 2, yOffset: -2 },
+  //   { xOffset: 3, yOffset: -3 },
+  //   { xOffset: 4, yOffset: -4 },
+  //   { xOffset: 5, yOffset: -5 },
+  //   { xOffset: 6, yOffset: -6 },
+  //   { xOffset: 7, yOffset: -7 },
+  // ];
+
+  // let rookMove = [
+  //   // вверх
+
+  //   { xOffset: 0, yOffset: 1 },
+  //   { xOffset: 0, yOffset: 2 },
+  //   { xOffset: 0, yOffset: 3 },
+  //   { xOffset: 0, yOffset: 4 },
+  //   { xOffset: 0, yOffset: 5 },
+  //   { xOffset: 0, yOffset: 6 },
+  //   { xOffset: 0, yOffset: 7 },
+
+  //   // вправо
+
+  //   { xOffset: 1, yOffset: 0 },
+  //   { xOffset: 2, yOffset: 0 },
+  //   { xOffset: 3, yOffset: 0 },
+  //   { xOffset: 4, yOffset: 0 },
+  //   { xOffset: 5, yOffset: 0 },
+  //   { xOffset: 6, yOffset: 0 },
+  //   { xOffset: 7, yOffset: 0 },
+
+  //   // влево
+
+  //   { xOffset: -1, yOffset: 0 },
+  //   { xOffset: -2, yOffset: 0 },
+  //   { xOffset: -3, yOffset: 0 },
+  //   { xOffset: -4, yOffset: 0 },
+  //   { xOffset: -5, yOffset: 0 },
+  //   { xOffset: -6, yOffset: 0 },
+  //   { xOffset: -7, yOffset: 0 },
+
+  //   // вниз
+
+  //   { xOffset: 0, yOffset: -1 },
+  //   { xOffset: 0, yOffset: -2 },
+  //   { xOffset: 0, yOffset: -3 },
+  //   { xOffset: 0, yOffset: -4 },
+  //   { xOffset: 0, yOffset: -5 },
+  //   { xOffset: 0, yOffset: -6 },
+  //   { xOffset: 0, yOffset: -7 },
+  // ];
+
+
+  let getCellId = (x, y) => cells.find(cell => cell.y == y && cell.x == x)?.id
+  let getFigureIdFromCell = (x, y) => cells.find(cell => cell.y == y && cell.x == x)?.figure
+
+  let checkFigureInCell = (x, y) => {
+    let figureId = cells.find((el) => el.x == x && el.y == y).figure;
+    return getFigureById(figureId);
+  };
+
+   
+  let checkCell = (isFigureInCell, array, cellId) => {
+// как назвать эту функцию?
+    if (isFigureInCell) {
+      // если есть фигура в клетке то проверяем ее цвет, если цвет равен цвету вражеской фигуры то добавляем клетку 
+      // с этой фигурой в массив клеток, куда может ходить выбранная фигура
+        if (isFigureInCell.color !== playerSide) {
+         array.push(cellId);
+        }
+        return true;
+      }
+      array.push(cellId)
+      
+  } 
 
   let whereFigureCouldGo = (figure, cell) => {
-    let dots = [];
-
-    let foundCell;
-
-    let foundCellForMove = (x, y) =>
-      cells.find((el) => el.y == y && el.x == x)?.id;
-
+    let cellsIDWhereFigureCanGo = []; // название dots можно заменить на это 
+    let dots = []
+    
     if (figure?.type == "pawn" && figure.color == "white") {
-      for (let i = cell.y + 1; i < 4; i++) {
-        foundCell = cells.find((el) => el.y == i && el.x == cell.x)?.id;
+        for (let i = cell.y + 1; i < 4; i++) {
+          dots.push(getCellId(cell.x, i));
+        }
 
-        dots.push(foundCell);
-      }
     } else if (figure?.type == "pawn" && figure.color == "black") {
-      for (let i = cell.y - 1; i > 3; i--) {
-        foundCell = cells.find((el) => el.y == i && el.x == cell.x)?.id;
+        for (let i = cell.y - 1; i > 3; i--) {
+          dots.push(getCellId(cell.x, i));
+        }
 
-        dots.push(foundCell);
-      }
     } else if (figure?.type == "knight") {
-      knightMove.map((it) => {
-        foundCell = cells.find(
-          (el) => el.y == cell.y + it.yOffset && el.x == cell.x + it.xOffset
-        )?.id;
 
-        dots.push(foundCell);
-      });
+        dots.push(getCellId(cell.x + 1, cell.y + 2))
+        dots.push(getCellId(cell.x + 1, cell.y - 2))
+        dots.push(getCellId(cell.x - 1, cell.y + 2))
+        dots.push(getCellId(cell.x - 1, cell.y - 2))
+        dots.push(getCellId(cell.x + 2, cell.y + 1))
+        dots.push(getCellId(cell.x + 2, cell.y - 1))
+        dots.push(getCellId(cell.x - 2, cell.y + 1))
+        dots.push(getCellId(cell.x - 2, cell.y - 1))
+      
+        
+        //  knightMove.map(el => dots.push(getCellId(cell.x + el.xOffset, cell.y + el.yOffset)))
+  
+
     } else if (figure?.type == "bishop") {
-      // x+, y+
 
-      for (let i = 1; i < 8; i++) {
-        foundCell = cells.find(
-          (el) => el.y == cell.y + i && el.x == cell.x + i
-        )?.id;
+        // x+, y+  // x-, y+  // x-, y-  // x+, y-
+        for (let i = 1; i < maxBoardWidth; i++) {
+          dots.push(getCellId(cell.x + i, cell.y + i));
 
-        dots.push(foundCell);
-      }
+          dots.push(getCellId(cell.x - i, cell.y + i));
+          
+          dots.push(getCellId(cell.x - i, cell.y - i));
 
-      // x-, y-
+          dots.push(getCellId(cell.x + i, cell.y - i));
+        }
 
-      for (let i = 7; i > 0; i--) {
-        foundCell = cells.find(
-          (el) => el.y == cell.y - i && el.x == cell.x - i
-        )?.id;
 
-        dots.push(foundCell);
-      }
+        // bishopMove.map(it => dots.push( getCellId(cell.x + it.xOffset, cell.y + it.yOffset) ) )
 
-      // x-, y+
-
-      for (let i = 1; i < 8; i++) {
-        foundCell = cells.find(
-          (el) => el.y == cell.y + i && el.x == cell.x - i
-        )?.id;
-
-        dots.push(foundCell);
-      }
-
-      // x+, y-
-
-      for (let i = 7; i > 0; i--) {
-        foundCell = cells.find(
-          (el) => el.y == cell.y - i && el.x == cell.x + i
-        )?.id;
-
-        dots.push(foundCell);
-      }
-
-      // bishopMove.map(it => {
-      //   foundCell = cells.find(el => el.y == cell.y + it.yOffset && el.x == cell.x + it.xOffset)?.id
-      //   dots.push(( foundCell ))
-      // })
     } else if (figure?.type == "rook") {
-      let checkFigureInCell = (x, y) => {
-        let figureInCell = cells.find((el) => el.x == x && el.y == y).figure;
 
-        if (figureInCell) {
-          let figureColor = figures.find((fig) => fig.id == figureInCell).color;
+        // x0, y+ вверх
+        for (let i = cell.y + 1; i < maxBoardHeight; i++) {
+          
+          let figInCell = checkCell(getFigureById(getFigureIdFromCell(cell.x, i)), dots, getCellId(cell.x, i))
 
-          if (figureColor !== playerSide) {
-            setEnemyFig((prev) => [...prev, figureInCell]);
-            enemyFig2.push(figureInCell);
-            //  console.log(enemyFig2)
-          }
+          if(figInCell) {
+            break;
+          } 
+          checkCell(checkFigureInCell(cell.x, i), dots, getCellId(cell.x, i)) 
         }
 
-        return figureInCell;
-      };
+        // x0, y- вниз
+        for (let i = cell.y - 1; i >= 0; i--) {
+          let figInCell = checkCell(checkFigureInCell(cell.x, i), dots, getCellId(cell.x, i))
 
-      let figureInCell;
-
-      // x0, y+ вверх
-      for (let i = cell.y + 1; i < 8; i++) {
-        figureInCell = checkFigureInCell(cell.x, i);
-
-        if (figureInCell) {
-          if (enemyFig2.includes(figureInCell)) {
-            dots.push(foundCellForMove(cell.x, i));
-          }
-
-          break;
+          if(figInCell) {
+            break;
+          } 
+          checkCell(checkFigureInCell(cell.x, i), dots, getCellId(cell.x, i))
         }
-        dots.push(foundCellForMove(cell.x, i));
-      }
 
-      // x0, y- вниз
-      for (let i = cell.y - 1; i >= 0; i--) {
-        dots.push(foundCellForMove(cell.x, i));
-      }
+        // x+, y0 вправо
+        for (let i = cell.x + 1; i < maxBoardWidth; i++) {
+    
+          let figInCell = checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
 
-      // x+, y0 вправо
-      for (let i = cell.x + 1; i < 8; i++) {
-        dots.push(foundCellForMove(i, cell.y));
-      }
+          if(figInCell) {
+            break;
+          } 
+          checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
+        }
+        // x-, y0 влево
+        for (let i = cell.x - 1; i >= 0; i--) {
+          let figInCell = checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
 
-      // x-, y0 влево
-      for (let i = cell.x - 1; i >= 0; i--) {
-        dots.push(foundCellForMove(i, cell.y));
-      }
+          if(figInCell) {
+            break;
+          } 
+          checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
+        
+        }
     }
 
-    // конь
-    //   //вправо вверх
-    //   foundCell = cells.find(el => el.y == cell.y + 2 && el.x == cell.x - 1)?.id
-
-    //   dots.push(( foundCell ))
-
-    //   // влево вверх
-
-    //   foundCell = cells.find(el => el.y == cell.y + 2 && el.x == cell.x + 1)?.id
-
-    //      dots.push(( foundCell ))
-
-    //   // вниз влево
-
-    //      foundCell = cells.find(el => el.y == cell.y - 2 && el.x == cell.x - 1)?.id
-
-    //      dots.push(( foundCell ))
-
-    //   // вниз вправо
-
-    //      foundCell = cells.find(el => el.y == cell.y - 2 && el.x == cell.x + 1)?.id
-
-    //      dots.push(( foundCell ))
-
-    //   // влево вверх
-
-    //   foundCell = cells.find(el => el.y == cell.y + 1 && el.x == cell.x - 2)?.id
-
-    //      dots.push(( foundCell ))
-
-    //      // влево вниз
-
-    //   foundCell = cells.find(el => el.y == cell.y - 1 && el.x == cell.x - 2)?.id
-
-    //   dots.push(( foundCell ))
-
-    //    // вправо вверх
-
-    //    foundCell = cells.find(el => el.y == cell.y + 1 && el.x == cell.x + 2)?.id
-
-    //    dots.push(( foundCell ))
-
-    //    // вправо вниз
-
-    // foundCell = cells.find(el => el.y == cell.y - 1 && el.x == cell.x + 2)?.id
-
-    // dots.push(( foundCell ))
-
-    // console.log(dots)
 
     return dots;
   };
+
 
   let isCellFirstTap = (cell) => cell.id == move.firstTap?.id;
 
@@ -595,23 +421,16 @@ export default function ChessBoard() {
     return figure?.color == playerSide && !isCellFirstTap(cell) ? "cellOnFocus" : null;
   };
 
-  // let changeFigurePosition = (foundFigId, cell) => {
-
-  //   setFigureInCell(foundFigId, cell.x, cell.y)
-
-  // }
-
-  let [killedFigure, setKilledFigure] = useState([])
 
   let setM = (cell) => {
     let figure = getFigureById(cell.figure);
 
     if (figure?.color === playerSide) {
       setMove((prev) => ({ ...prev, firstTap: cell }));
-
-      let dots = whereFigureCouldGo(figure, cell);
-
-      setAvailableToMove([...dots]);
+      
+      
+      setAvailableToMove([...whereFigureCouldGo(figure, cell)]);
+      
     } else if (availableToMove.includes(cell.id)) {
       setMove((prev) => ({ ...prev, secondTap: cell }));
 
@@ -631,25 +450,9 @@ export default function ChessBoard() {
 
       setAvailableToMove([]);
 
-        
-        // enemyFig.map(figid => 
-        //   {
-        //     let cell = cells.find(c => c.figure == figid).figure
-            
-        //     if (cell == figid) {
-        //       setKilledFigure(prev => [...prev, figid])
-        //     }
-        //   }
-        //   )
-        
-
-     
-      setEnemyFig([]);
     }
   };
 
-  console.log(enemyFig);
-  console.log(history);
 
   return (
     <div className="d-flex justify-content-  w-100  p-2 px-5">
@@ -700,11 +503,11 @@ export default function ChessBoard() {
                   canActivateCell(cell) +
                   " " +
                   (isCellFirstTap(cell) ? "activeCell" : "") +
-                  (availableToMove.includes(cell.id) && !enemyFig.includes(cell.figure)
+                  (availableToMove.includes(cell.id) && cell.figure
+                  ? " bg-green" :
+                    availableToMove.includes(cell.id) 
                     ? " fa-solid fa-circle green-circle fs-4"
-                    : enemyFig.includes(cell.figure)
-                    ? '  red-circle '
-                    // " fa-regular fa-circle green-circle fs-1 "
+                    
                     : "")
                 }
                 style={{ width: "4rem", height: "4rem" }}
@@ -712,9 +515,8 @@ export default function ChessBoard() {
               >
                 {/* {cell.x} */}
                 {
-                   enemyFig.includes(cell.figure)
+                   availableToMove.includes(cell.id) && cell.figure
                    ? 
-                  
                   <img src={sword} alt="" width='50px' style={{}}/>
                   : ""
                 }
@@ -747,11 +549,9 @@ export default function ChessBoard() {
             className="bg-black opacity-75 text-white"
             style={{ height: "15%" }}
           >
-            <div className="p-1 text-start d-flex">
+            <div className="py-1 px-2 text-start d-flex">
               <i className="fa-solid fa-circle text-success pt-1"></i>
-
               <div className="ps-1">Player</div>
-
               <div className="w-100 text-end pe-1">
                 {playerSide == "black" ? "<" : null}
               </div>
@@ -775,10 +575,10 @@ export default function ChessBoard() {
           <div className=" py-1 ">
             <div className=" bg-brown py-2 px-3 text-center " style={{overflow: 'auto', height:'300px' }} id= 'myDiv'>
               {history.map((el, i) => (
-                <div className="border-bottom-brown text-white row">
-                  <div className="px-2 col-2 ">{i + 1}</div>
+                <div className="border-bottom-brown text-white row py-1">
+                  <div className="px-2 col-2">{i + 1}</div>
 
-                  <div className={`w-50 text-${el.figureColor} col `}>
+                  <div className={`w-50 text-${el.figureColor} col   `}>
                     <span
                       className={renderFigure(el.firstTap?.figure) + " px-1"}
                     ></span>
@@ -786,7 +586,7 @@ export default function ChessBoard() {
                     {el.firstTap?.id}
                   </div>
 
-                  <div className={`w-50 text-${el.figureColor} col  `}>
+                  <div className={`w-50 text-${el.figureColor} text-end pe-5 col  `}>
                     {el.secondTap?.figure ? 
                       <i
                       className={renderFigure(el.secondTap?.figure) + " px-1 "}
@@ -810,7 +610,7 @@ export default function ChessBoard() {
           </div>
 
           <div className="bg-white " style={{ height: "15%" }}>
-            <div className="p-1 text-start d-flex">
+            <div className="py-1 px-2 text-start d-flex">
               <div className="fa-solid fa-circle text-success pt-1"></div>
               <div className="ps-1 ">Player</div>
               <div className="w-100 text-end pe-1">
@@ -821,8 +621,17 @@ export default function ChessBoard() {
               <div className={"p-2 w-50 fs-4  " + (playerSide == "white" ? "playerTurn" : "")}>
                 --:--
               </div>
-              <div className="text-start ps-1 w-50  ">{
+              <div className="text-start ps-2 w-50  "> {
                 history.map(el => (
+                  
+                  // el.secondTap?.figure && el.figureColor == 'white' && getFigureById(el.secondTap?.figure).type === 'pawn' 
+                  // ?  paw += 1 &&
+                
+                
+                  //   <i > x {paw}</i>
+                  
+                    
+                  // : 
                    el.secondTap?.figure && el.figureColor == 'white' ?
                   <i className={(renderFigure(el.secondTap?.figure)) + ' pe-1'}></i>
                    : null

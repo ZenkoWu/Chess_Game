@@ -36,8 +36,7 @@
   
 }
 
-.red-circle {
-  /* color: rgb(255, 2, 2); */
+.bg-green {
   background-color: rgba(91, 167, 73, 0.719);
 }
 .activeCell{
