@@ -137,68 +137,35 @@ export default function ChessBoard() {
 
   let historyPush = (move) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide }]);
 
+  const [availableToMove, setAvailableToMove] = useState([]);
 
   useEffect(() => {
     if (move.secondTap) {
-      
 
-      // setAvailableToMove([]);
+      setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
 
-      //   setCells((prev) =>
+      setCells((prev) =>
+        prev.map((el) => {
+          if (el.id == move.firstTap.id) {
+            return { ...el, figure: null };
+          } else {
+            return el;
+          }
+        })
+      );
 
-      //   prev.map(el => {
-
-      //     if(el.id == move.firstTap.id) {
-
-      //       return {...el, figure: null}
-
-      //     } else {
-
-      //       return el
-
-      //     }
-
-      //   }
-
-      //   ))
-
-      //  setAvailableToMove([])
-
+      setAvailableToMove([]);
 
       historyPush(move);
-        
       setMove({});
       // setPlayerSide(prev => prev == 'white' ? 'black' : 'white')
 
-      // setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y)
-
-      //   setCells((prev) =>
-
-      //   prev.map(el => {
-
-      //     if(el.id == move.firstTap?.id) {
-
-      //       return {...el, figure: null}
-
-      //     } else {
-
-      //       return el
-
-      //     }
-
-      //   }
-
-      //   ))
-
-      // setFigureInCell(figId, x, y)
-
     } else if (move.firstTap) {
-      // count where we can go
+        // count where we can go
+        setAvailableToMove([...whereFigureCouldGo(getFigureById(move.firstTap.figure), move.firstTap)]);
     }
   }, [move]);
 
-
-  const [availableToMove, setAvailableToMove] = useState([]);
 
   // let knightMove = [
   //   { xOffset: 2, yOffset: -1 },
@@ -297,27 +264,22 @@ export default function ChessBoard() {
 
 
   let getCellId = (x, y) => cells.find(cell => cell.y == y && cell.x == x)?.id
+
   let getFigureIdFromCell = (x, y) => cells.find(cell => cell.y == y && cell.x == x)?.figure
 
-  let checkFigureInCell = (x, y) => {
-    let figureId = cells.find((el) => el.x == x && el.y == y).figure;
-    return getFigureById(figureId);
-  };
-
+ 
    
-  let checkCell = (isFigureInCell, array, cellId) => {
-// как назвать эту функцию?
-    if (isFigureInCell) {
-      // если есть фигура в клетке то проверяем ее цвет, если цвет равен цвету вражеской фигуры то добавляем клетку 
-      // с этой фигурой в массив клеток, куда может ходить выбранная фигура
-        if (isFigureInCell.color !== playerSide) {
-         array.push(cellId);
-        }
-        return true;
-      }
-      array.push(cellId)
+  // let checkCell = (isFigureInCell, array, cellId) => {
+
+  //   if (isFigureInCell) {
+  //       if (isFigureInCell.color !== playerSide) {
+  //        array.push(cellId);
+  //       }
+  //       return true;
+  //     }
+  //     array.push(cellId)
       
-  } 
+  // } 
 
   let whereFigureCouldGo = (figure, cell) => {
     let cellsIDWhereFigureCanGo = []; // название dots можно заменить на это 
@@ -368,91 +330,84 @@ export default function ChessBoard() {
 
         // x0, y+ вверх
         for (let i = cell.y + 1; i < maxBoardHeight; i++) {
-          
-          let figInCell = checkCell(getFigureById(getFigureIdFromCell(cell.x, i)), dots, getCellId(cell.x, i))
-
-          if(figInCell) {
+          // ЛОГИКА В ЭТОМ ЦИКЛЕ И В 3-Х НИЖНИХ ПОВТОРЯЕТСЯ ПОЭТОМУ НУЖНО ВЫНЕСТИ ЕЕ В ФУНКЦИЮ, КАК?
+          let figure = getFigureById(getFigureIdFromCell(cell.x, i))
+          // если есть фигура в клетке то проверяем ее цвет, если цвет равен цвету вражеской фигуры то добавляем клетку 
+          // с этой фигурой в массив клеток - dots , куда может ходить выбранная фигура
+          if (figure) {
+            if (figure.color !== playerSide) {
+             dots.push(getCellId(cell.x, i));
+            }
             break;
-          } 
-          checkCell(checkFigureInCell(cell.x, i), dots, getCellId(cell.x, i)) 
+          }
+          dots.push(getCellId(cell.x, i));
+      
         }
 
         // x0, y- вниз
         for (let i = cell.y - 1; i >= 0; i--) {
-          let figInCell = checkCell(checkFigureInCell(cell.x, i), dots, getCellId(cell.x, i))
+          let figure = getFigureById(getFigureIdFromCell(cell.x, i))
 
-          if(figInCell) {
+          if (figure) {
+            if (figure.color !== playerSide) {
+             dots.push(getCellId(cell.x, i));
+            }
             break;
-          } 
-          checkCell(checkFigureInCell(cell.x, i), dots, getCellId(cell.x, i))
+          }
+          dots.push(getCellId(cell.x, i));
+
         }
 
         // x+, y0 вправо
         for (let i = cell.x + 1; i < maxBoardWidth; i++) {
-    
-          let figInCell = checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
+          let figure = getFigureById(getFigureIdFromCell(i, cell.y))
 
-          if(figInCell) {
+          if (figure) {
+            if (figure.color !== playerSide) {
+             dots.push(getCellId(i, cell.y));
+            }
             break;
-          } 
-          checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
+          }
+          dots.push(getCellId(i, cell.y));
+
         }
         // x-, y0 влево
         for (let i = cell.x - 1; i >= 0; i--) {
-          let figInCell = checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
+          let figure = getFigureById(getFigureIdFromCell(i, cell.y))
 
-          if(figInCell) {
+          if (figure) {
+            if (figure.color !== playerSide) {
+             dots.push(getCellId(i, cell.y));
+            }
             break;
-          } 
-          checkCell(checkFigureInCell(i, cell.y), dots, getCellId(i, cell.y))
+          }
+          dots.push(getCellId(i, cell.y));
         
         }
     }
 
-
     return dots;
   };
-
 
   let isCellFirstTap = (cell) => cell.id == move.firstTap?.id;
 
   let canActivateCell = (cell) => {
+    // функция, подсвечивающая какие фигуры можно нажать для хода
     let figure = getFigureById(cell.figure);
     return figure?.color == playerSide && !isCellFirstTap(cell) ? "cellOnFocus" : null;
   };
 
-
-  let setM = (cell) => {
+  let setFigureMoves = (cell) => {
     let figure = getFigureById(cell.figure);
 
     if (figure?.color === playerSide) {
       setMove((prev) => ({ ...prev, firstTap: cell }));
       
-      
-      setAvailableToMove([...whereFigureCouldGo(figure, cell)]);
-      
     } else if (availableToMove.includes(cell.id)) {
       setMove((prev) => ({ ...prev, secondTap: cell }));
 
-      // changeFigurePosition(move.firstTap.figure, move.secondTap.x, move.secondTap.y)
-      
-      setFigureInCell(move.firstTap.figure, cell.x, cell.y);
-
-      setCells((prev) =>
-        prev.map((el) => {
-          if (el.id == move.firstTap.id) {
-            return { ...el, figure: null };
-          } else {
-            return el;
-          }
-        })
-      );
-
-      setAvailableToMove([]);
-
     }
   };
-
 
   return (
     <div className="d-flex justify-content-  w-100  p-2 px-5">
@@ -511,7 +466,7 @@ export default function ChessBoard() {
                     : "")
                 }
                 style={{ width: "4rem", height: "4rem" }}
-                onClick={() => setM(cell)}
+                onClick={() => setFigureMoves(cell)}
               >
                 {/* {cell.x} */}
                 {
@@ -623,15 +578,6 @@ export default function ChessBoard() {
               </div>
               <div className="text-start ps-2 w-50  "> {
                 history.map(el => (
-                  
-                  // el.secondTap?.figure && el.figureColor == 'white' && getFigureById(el.secondTap?.figure).type === 'pawn' 
-                  // ?  paw += 1 &&
-                
-                
-                  //   <i > x {paw}</i>
-                  
-                    
-                  // : 
                    el.secondTap?.figure && el.figureColor == 'white' ?
                   <i className={(renderFigure(el.secondTap?.figure)) + ' pe-1'}></i>
                    : null
@@ -646,6 +592,3 @@ export default function ChessBoard() {
   );
 }
 
-
-// let d = document.getElementById("myDiv");
-// d.scrollTop = '270px'
