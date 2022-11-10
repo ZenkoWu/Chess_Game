@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import sword from '.././../imgs/sword-svgrepo-com.svg'
+import './ChessBoard.css'
 
 export default function ChessBoard() {
 
@@ -7,25 +8,70 @@ export default function ChessBoard() {
   const maxBoardHeight = 8;
   const letterACodeInASCII = 65;
 
-  let numbersAxis = Array.from(
-    { length: maxBoardHeight },
-    (el, i) => maxBoardHeight - i
-  );
+  let numbersAxis = Array.from( { length: maxBoardHeight },(_, i) => maxBoardHeight - i);
 
-  let lettersAxis = Array.from({ length: maxBoardWidth }, (el, i) =>
-    String.fromCharCode(i + letterACodeInASCII)
-  );
+  let lettersAxis = Array.from({ length: maxBoardWidth }, (_, i) =>String.fromCharCode(i + letterACodeInASCII));
 
   const figureTypes = ["king", "queen", "knight", "bishop", "rook", "pawn"].map(
     (value) => ({
       value,
       icon: "fa-solid fa-chess-" + value,
+      whereFigureCouldGo: (cell) =>
+        value === "king" ?
+          [
+          {x: cell.x + 1, y: cell.y},
+          {x: cell.x - 1, y: cell.y},
+          {x: cell.x, y: cell.y + 1},
+          {x: cell.x, y: cell.y - 1},
+          {x: cell.x + 1, y: cell.y + 1},
+          {x: cell.x + 1, y: cell.y - 1},
+          {x: cell.x - 1, y: cell.y - 1},
+          {x: cell.x - 1, y: cell.y + 1},
+          ]  
+        : value === "bishop" ? 
+          [
+            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+          ] 
+        : value === "rook" ?
+          [
+            Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+            Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+            Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+            Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+          ]
+        : value === "queen" ?
+          [
+            Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+            Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+            Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+            Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+          ]
+        : value === "knight" ? 
+          [
+            {x: cell.x + 1, y: cell.y + 2},
+            {x: cell.x + 1, y: cell.y - 2},
+            {x: cell.x - 1, y: cell.y + 2},
+            {x: cell.x - 1, y: cell.y - 2},
+            {x: cell.x + 2, y: cell.y + 1},
+            {x: cell.x + 2, y: cell.y - 1},
+            {x: cell.x - 2, y: cell.y + 1},
+            {x: cell.x - 2, y: cell.y - 1},
+          ]
+        : null
+    
     })
   );
 
 
   const [figures, setFigures] = useState(
-    Array.from({ length: 32 }, (el, i) => ({
+    Array.from({ length: 32 }, (_, i) => ({
       id: i + 1,
       color: i < 16 ? "black" : "white",
       type: (
@@ -43,18 +89,16 @@ export default function ChessBoard() {
   );
 
   const [cells, setCells] = useState(
-    Array.from({ length: maxBoardWidth * maxBoardHeight }, (el, i) => ({
-      id:
-        lettersAxis[i % maxBoardWidth] +
-        numbersAxis[Math.floor(i / maxBoardHeight) % maxBoardHeight],
+    Array.from({ length: maxBoardWidth * maxBoardHeight }, (_, i) => ({
+      id: lettersAxis[i % maxBoardWidth] + numbersAxis[Math.floor(i / maxBoardHeight) % maxBoardHeight],
       figure: null,
       x: i % maxBoardWidth,
       y: maxBoardHeight - 1 - (Math.floor(i / maxBoardHeight) % maxBoardHeight),
     }))
   );
 
-  let getDeafultCellColor = (x, y) => {
-    return (x % 2 == 0 && y % 2 == 0) || (x % 2 !== 0 && y % 2 !== 0)
+  let getDefultCellColor = (x, y) => {
+    return (x % 2 === 0 && y % 2 === 0) || (x % 2 !== 0 && y % 2 !== 0)
       ? "bg-lightColored"
       : "bg-brown";
   };
@@ -63,7 +107,7 @@ export default function ChessBoard() {
     setCells((prev) =>
       prev.map((el) => ({
         ...el,
-        figure: el.x == x && el.y == y ? figId : el.figure,
+        figure: el.x === x && el.y === y ? figId : el.figure,
       }))
     );
   }
@@ -77,8 +121,8 @@ export default function ChessBoard() {
       for (let i = el.start; i < maxBoardWidth; i += el.xOffsetBetweenFigures) {
         foundFigureId = figures.find(
           (f) =>
-            f.type == el.type &&
-            f.color == el.color &&
+            f.type === el.type &&
+            f.color === el.color &&
             !arrayOfFoundElementsId.includes(f.id)
         ).id;
 
@@ -120,10 +164,8 @@ export default function ChessBoard() {
 
     if (figure) {
       return (
-        figureTypes.find((it) => it.value == figure.type).icon +
-        " text-" +
-        figure.color +
-        (figure.color == "white" && shadow ? " figureShadow" : "")
+        figureTypes.find((it) => it.value === figure.type).icon + " text-" + figure.color +
+        (figure.color === "white" && shadow ? " figureShadow" : "")
       );
     }
 
@@ -146,7 +188,7 @@ export default function ChessBoard() {
 
       setCells((prev) =>
         prev.map((el) => {
-          if (el.id == move.firstTap.id) {
+          if (el.id === move.firstTap.id) {
             return { ...el, figure: null };
           } else {
             return el;
@@ -158,7 +200,7 @@ export default function ChessBoard() {
 
       historyPush(move);
       setMove({});
-      // setPlayerSide(prev => prev == 'white' ? 'black' : 'white')
+      // setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
 
     } else if (move.firstTap) {
         // count where we can go
@@ -166,235 +208,180 @@ export default function ChessBoard() {
     }
   }, [move]);
 
+ 
+  let getCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)
 
-  // let knightMove = [
-  //   { xOffset: 2, yOffset: -1 },
-  //   { xOffset: 2, yOffset: 1 },
-  //   { xOffset: -2, yOffset: -1 },
-  //   { xOffset: -2, yOffset: 1 },
-  //   { xOffset: 1, yOffset: -2 },
-  //   { xOffset: -1, yOffset: -2 },
-  //   { xOffset: 1, yOffset: 2 },
-  //   { xOffset: -1, yOffset: 2 },
-  // ];
+  let getCellId = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.id
 
-  // let bishopMove = [
-  //   // вверх вправо
+  let getFigureIdFromCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.figure
+  
+  let getFigureByXY = (x, y) => {
+    let figId = cells.find(c => c.x === x && c.y === y)?.figure
+    let fig = figures.find(f => f.id === figId)
+    return fig
+  }
 
-  //   { xOffset: 1, yOffset: 1 },
-  //   { xOffset: 2, yOffset: 2 },
-  //   { xOffset: 3, yOffset: 3 },
-  //   { xOffset: 4, yOffset: 4 },
-  //   { xOffset: 5, yOffset: 5 },
-  //   { xOffset: 6, yOffset: 6 },
-  //   { xOffset: 7, yOffset: 7 },
+  console.log(figureTypes)
 
-  //   // вверх влево
+  const pointsForRookMove = cell => [
+    Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+    Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+    Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+    Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+  ]
 
-  //   { xOffset: -1, yOffset: 1 },
-  //   { xOffset: -2, yOffset: 2 },
-  //   { xOffset: -3, yOffset: 3 },
-  //   { xOffset: -4, yOffset: 4 },
-  //   { xOffset: -5, yOffset: 5 },
-  //   { xOffset: -6, yOffset: 6 },
-  //   { xOffset: -7, yOffset: 7 },
+  const pointsForKnightMove = cell => [
+    {x: cell.x + 1, y: cell.y + 2},
+    {x: cell.x + 1, y: cell.y - 2},
+    {x: cell.x - 1, y: cell.y + 2},
+    {x: cell.x - 1, y: cell.y - 2},
+    {x: cell.x + 2, y: cell.y + 1},
+    {x: cell.x + 2, y: cell.y - 1},
+    {x: cell.x - 2, y: cell.y + 1},
+    {x: cell.x - 2, y: cell.y - 1},
 
-  //   // вниз влево
+  ]
 
-  //   { xOffset: -1, yOffset: -1 },
-  //   { xOffset: -2, yOffset: -2 },
-  //   { xOffset: -3, yOffset: -3 },
-  //   { xOffset: -4, yOffset: -4 },
-  //   { xOffset: -5, yOffset: -5 },
-  //   { xOffset: -6, yOffset: -6 },
-  //   { xOffset: -7, yOffset: -7 },
+  const pointsForBishopMove = cell => [
+    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+  ]
 
-  //   // вниз вправо
+  const pointsForQueenMove = cell => [
+    ...pointsForRookMove(cell),
+    ...pointsForBishopMove(cell),
 
-  //   { xOffset: 1, yOffset: -1 },
-  //   { xOffset: 2, yOffset: -2 },
-  //   { xOffset: 3, yOffset: -3 },
-  //   { xOffset: 4, yOffset: -4 },
-  //   { xOffset: 5, yOffset: -5 },
-  //   { xOffset: 6, yOffset: -6 },
-  //   { xOffset: 7, yOffset: -7 },
-  // ];
+  ]
 
-  // let rookMove = [
-  //   // вверх
-
-  //   { xOffset: 0, yOffset: 1 },
-  //   { xOffset: 0, yOffset: 2 },
-  //   { xOffset: 0, yOffset: 3 },
-  //   { xOffset: 0, yOffset: 4 },
-  //   { xOffset: 0, yOffset: 5 },
-  //   { xOffset: 0, yOffset: 6 },
-  //   { xOffset: 0, yOffset: 7 },
-
-  //   // вправо
-
-  //   { xOffset: 1, yOffset: 0 },
-  //   { xOffset: 2, yOffset: 0 },
-  //   { xOffset: 3, yOffset: 0 },
-  //   { xOffset: 4, yOffset: 0 },
-  //   { xOffset: 5, yOffset: 0 },
-  //   { xOffset: 6, yOffset: 0 },
-  //   { xOffset: 7, yOffset: 0 },
-
-  //   // влево
-
-  //   { xOffset: -1, yOffset: 0 },
-  //   { xOffset: -2, yOffset: 0 },
-  //   { xOffset: -3, yOffset: 0 },
-  //   { xOffset: -4, yOffset: 0 },
-  //   { xOffset: -5, yOffset: 0 },
-  //   { xOffset: -6, yOffset: 0 },
-  //   { xOffset: -7, yOffset: 0 },
-
-  //   // вниз
-
-  //   { xOffset: 0, yOffset: -1 },
-  //   { xOffset: 0, yOffset: -2 },
-  //   { xOffset: 0, yOffset: -3 },
-  //   { xOffset: 0, yOffset: -4 },
-  //   { xOffset: 0, yOffset: -5 },
-  //   { xOffset: 0, yOffset: -6 },
-  //   { xOffset: 0, yOffset: -7 },
-  // ];
-
-
-  let getCellId = (x, y) => cells.find(cell => cell.y == y && cell.x == x)?.id
-
-  let getFigureIdFromCell = (x, y) => cells.find(cell => cell.y == y && cell.x == x)?.figure
+  const pointsForKingMove = cell => [
+    {x: cell.x + 1, y: cell.y},
+    {x: cell.x - 1, y: cell.y},
+    {x: cell.x, y: cell.y + 1},
+    {x: cell.x, y: cell.y - 1},
+    {x: cell.x + 1, y: cell.y + 1},
+    {x: cell.x + 1, y: cell.y - 1},
+    {x: cell.x - 1, y: cell.y - 1},
+    {x: cell.x - 1, y: cell.y + 1},
+  ]
 
  
-   
-  // let checkCell = (isFigureInCell, array, cellId) => {
-
-  //   if (isFigureInCell) {
-  //       if (isFigureInCell.color !== playerSide) {
-  //        array.push(cellId);
-  //       }
-  //       return true;
-  //     }
-  //     array.push(cellId)
-      
-  // } 
-
   let whereFigureCouldGo = (figure, cell) => {
-    let cellsIDWhereFigureCanGo = []; // название dots можно заменить на это 
     let dots = []
+
     
-    if (figure?.type == "pawn" && figure.color == "white") {
-        for (let i = cell.y + 1; i < 4; i++) {
-          dots.push(getCellId(cell.x, i));
-        }
+    if (figure?.type === "pawn" && figure.color === "white") {
 
-    } else if (figure?.type == "pawn" && figure.color == "black") {
-        for (let i = cell.y - 1; i > 3; i--) {
-          dots.push(getCellId(cell.x, i));
-        }
-
-    } else if (figure?.type == "knight") {
-
-        dots.push(getCellId(cell.x + 1, cell.y + 2))
-        dots.push(getCellId(cell.x + 1, cell.y - 2))
-        dots.push(getCellId(cell.x - 1, cell.y + 2))
-        dots.push(getCellId(cell.x - 1, cell.y - 2))
-        dots.push(getCellId(cell.x + 2, cell.y + 1))
-        dots.push(getCellId(cell.x + 2, cell.y - 1))
-        dots.push(getCellId(cell.x - 2, cell.y + 1))
-        dots.push(getCellId(cell.x - 2, cell.y - 1))
+      let a =  [
+        {x: cell.x, y: cell.y + 2},
+        {x: cell.x, y: cell.y + 1},
+        {x: cell.x + 1, y: cell.y + 1},
+        {x: cell.x - 1, y: cell.y + 1},
+      ]
       
+      a.map(el => {
+        if (cell.y == 1 && !getCell(el.x, el.y)?.figure && !getCell(el.x, el.y)?.figure) {
+          dots.push(getCellId(el.x, el.y))
+        } else {
+            if (getFigureByXY(el.x, el.y)?.color === 'black') {
+              dots.push(getCellId(el.x, el.y)) 
+            }
+            if (getFigureByXY(el.x, el.y)?.color === 'black') {
+            dots.push(getCellId(el.x, el.y))
+            }
+        }
+        if (getCell(el.x, el.y)?.figure) {
+          return dots; 
+        } 
+           
+        dots.push(getCellId(el.x, el.y))
+      } 
         
-        //  knightMove.map(el => dots.push(getCellId(cell.x + el.xOffset, cell.y + el.yOffset)))
-  
-
-    } else if (figure?.type == "bishop") {
-
-        // x+, y+  // x-, y+  // x-, y-  // x+, y-
-        for (let i = 1; i < maxBoardWidth; i++) {
-          dots.push(getCellId(cell.x + i, cell.y + i));
-
-          dots.push(getCellId(cell.x - i, cell.y + i));
+      )
+       
+      // if (cell.y == 1 && !getCell(cell.x, cell.y + 1)?.figure && !getCell(cell.x, cell.y + 2)?.figure) {
+      //   dots.push(getCellId(cell.x, cell.y + 2))
+      // } 
+      // else {
+      //     if (getFigureByXY(cell.x + 1, cell.y + 1)?.color === 'black') {
+      //       dots.push(getCellId(cell.x + 1, cell.y + 1)) 
           
-          dots.push(getCellId(cell.x - i, cell.y - i));
+      //     }
+      //       if (getFigureByXY(cell.x - 1, cell.y + 1)?.color === 'black') {
+      //       dots.push(getCellId(cell.x - 1, cell.y + 1))
+            
+      //       }
+      // } 
+      // if (getCell(cell.x, cell.y + 1)?.figure) {
+      //   return dots; 
+      // } 
+         
+      // dots.push(getCellId(cell.x, cell.y + 1))
+        
+        
 
-          dots.push(getCellId(cell.x + i, cell.y - i));
-        }
-
-
-        // bishopMove.map(it => dots.push( getCellId(cell.x + it.xOffset, cell.y + it.yOffset) ) )
-
-    } else if (figure?.type == "rook") {
-
-        // x0, y+ вверх
-        for (let i = cell.y + 1; i < maxBoardHeight; i++) {
-          // ЛОГИКА В ЭТОМ ЦИКЛЕ И В 3-Х НИЖНИХ ПОВТОРЯЕТСЯ ПОЭТОМУ НУЖНО ВЫНЕСТИ ЕЕ В ФУНКЦИЮ, КАК?
-          let figure = getFigureById(getFigureIdFromCell(cell.x, i))
-          // если есть фигура в клетке то проверяем ее цвет, если цвет равен цвету вражеской фигуры то добавляем клетку 
-          // с этой фигурой в массив клеток - dots , куда может ходить выбранная фигура
-          if (figure) {
-            if (figure.color !== playerSide) {
-             dots.push(getCellId(cell.x, i));
-            }
-            break;
-          }
-          dots.push(getCellId(cell.x, i));
+    } else if (figure?.type === "pawn" && figure.color === "black") {
       
-        }
-
-        // x0, y- вниз
-        for (let i = cell.y - 1; i >= 0; i--) {
-          let figure = getFigureById(getFigureIdFromCell(cell.x, i))
-
-          if (figure) {
-            if (figure.color !== playerSide) {
-             dots.push(getCellId(cell.x, i));
-            }
-            break;
-          }
-          dots.push(getCellId(cell.x, i));
-
-        }
-
-        // x+, y0 вправо
-        for (let i = cell.x + 1; i < maxBoardWidth; i++) {
-          let figure = getFigureById(getFigureIdFromCell(i, cell.y))
-
-          if (figure) {
-            if (figure.color !== playerSide) {
-             dots.push(getCellId(i, cell.y));
-            }
-            break;
-          }
-          dots.push(getCellId(i, cell.y));
-
-        }
-        // x-, y0 влево
-        for (let i = cell.x - 1; i >= 0; i--) {
-          let figure = getFigureById(getFigureIdFromCell(i, cell.y))
-
-          if (figure) {
-            if (figure.color !== playerSide) {
-             dots.push(getCellId(i, cell.y));
-            }
-            break;
-          }
-          dots.push(getCellId(i, cell.y));
+      if(cell.y == 6 && !getCell(cell.x, cell.y - 1)?.figure && !getCell(cell.x, cell.y - 2)?.figure) {
+        dots.push(getCellId(cell.x, cell.y - 2)) 
+      } 
+      else {
+        if (getFigureByXY(cell.x - 1, cell.y - 1)?.color === 'white') {
+          dots.push(getCellId(cell.x - 1, cell.y - 1)) 
         
         }
+        if (getFigureByXY(cell.x + 1, cell.y - 1)?.color === 'white') {
+          dots.push(getCellId(cell.x + 1, cell.y - 1))
+          
+        }
+      }
+      if (getCell(cell.x, cell.y - 1)?.figure) {
+        return dots; 
+      } 
+         
+      dots.push(getCellId(cell.x, cell.y - 1))
+         
+    } else {
+      let pushCellsIdWhereFigureCanGo = (x, y, array) => {
+        if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) 
+          return true;
+
+        let figure = getFigureById(getFigureIdFromCell(x, y))
+
+        if (figure) {
+          if (figure.color !== playerSide) {
+            array.push(getCellId(x, y));
+          }
+          return true;
+        }
+        array.push(getCellId(x, y));
+      }
+
+        figureTypes.find(f => f.value == figure.type)?.whereFigureCouldGo(cell)
+        ?.forEach(el => {
+          if(Array.isArray(el)) {
+            for (let p of el) {
+              if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots) ) {
+                break;
+              }
+            }
+          } else {
+            pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+          }
+        })
+  
     }
 
     return dots;
   };
 
-  let isCellFirstTap = (cell) => cell.id == move.firstTap?.id;
+  let isCellFirstTap = (cell) => cell.id === move.firstTap?.id;
 
   let canActivateCell = (cell) => {
     // функция, подсвечивающая какие фигуры можно нажать для хода
     let figure = getFigureById(cell.figure);
-    return figure?.color == playerSide && !isCellFirstTap(cell) ? "cellOnFocus" : null;
+    return figure?.color === playerSide && !isCellFirstTap(cell) ? "cellOnFocus" : null;
   };
 
   let setFigureMoves = (cell) => {
@@ -402,8 +389,8 @@ export default function ChessBoard() {
 
     if (figure?.color === playerSide) {
       setMove((prev) => ({ ...prev, firstTap: cell }));
-      
-    } else if (availableToMove.includes(cell.id)) {
+    } 
+    else if (availableToMove.includes(cell.id)) {
       setMove((prev) => ({ ...prev, secondTap: cell }));
 
     }
@@ -453,15 +440,15 @@ export default function ChessBoard() {
               <div
                 key={cell.id}
                 className={
-                  getDeafultCellColor(cell.x, cell.y) +
+                  getDefultCellColor(cell.x, cell.y) +
                   " opacity-75 d-flex justify-content-center align-items-center " +
                   canActivateCell(cell) +
                   " " +
                   (isCellFirstTap(cell) ? "activeCell" : "") +
                   (availableToMove.includes(cell.id) && cell.figure
-                  ? " bg-green" :
+                  ? " bg-green cursor" :
                     availableToMove.includes(cell.id) 
-                    ? " fa-solid fa-circle green-circle fs-4"
+                    ? " fa-solid fa-circle green-circle fs-4 cursor"
                     
                     : "")
                 }
@@ -501,23 +488,23 @@ export default function ChessBoard() {
       <div className="w-50 p-2">
         <div className="w-100 h-100">
           <div
-            className="bg-black opacity-75 text-white"
+            className={'bg-black text-white' + (playerSide === "black" ? " opacity-75" : " opacity-50")}
             style={{ height: "15%" }}
           >
             <div className="py-1 px-2 text-start d-flex">
               <i className="fa-solid fa-circle text-success pt-1"></i>
               <div className="ps-1">Player</div>
               <div className="w-100 text-end pe-1">
-                {playerSide == "black" ? "<" : null}
+                {playerSide === "black" ? "<" : null}
               </div>
             </div>
             <div className="d-flex">
-              <div className={"p-2 w-50 fs-4 " + (playerSide == "black" ? "playerTurn" : "")}>
+              <div className={"p-2 w-50 fs-4 " + (playerSide === "black" ? "playerTurn" : "")}>
                 --:--
               </div>
               <div className=" text-start ps-2 w-50  ">{
                   history.map(el =>(
-                    el.secondTap?.figure && el.figureColor == 'black'
+                    el.secondTap?.figure && el.figureColor === 'black'
                      ?
                     <i className={(renderFigure(el.secondTap?.figure)) + ' pe-1 '}></i>
                      : null
@@ -533,7 +520,7 @@ export default function ChessBoard() {
                 <div className="border-bottom-brown text-white row py-1">
                   <div className="px-2 col-2">{i + 1}</div>
 
-                  <div className={`w-50 text-${el.figureColor} col   `}>
+                  <div className={` text-${el.figureColor} col-5   `}>
                     <span
                       className={renderFigure(el.firstTap?.figure) + " px-1"}
                     ></span>
@@ -541,7 +528,7 @@ export default function ChessBoard() {
                     {el.firstTap?.id}
                   </div>
 
-                  <div className={`w-50 text-${el.figureColor} text-end pe-5 col  `}>
+                  <div className={` text-${el.figureColor} text-end pe-5 col-5  `}>
                     {el.secondTap?.figure ? 
                       <i
                       className={renderFigure(el.secondTap?.figure) + " px-1 "}
@@ -558,27 +545,27 @@ export default function ChessBoard() {
           <div style={{ height: "15%" }} className="pb-1">
             <div className="bg-brown h-100">
               <div className="fs-2 text-white p-3">
-                <i class="fa-solid fa-house pe-4"></i>
-                <i class="fa-solid fa-flag fs-3"></i>
+                <i class="fa-solid fa-house pe-4 cursor"></i>
+                <i class="fa-solid fa-flag fs-3 cursor"></i>
               </div>
             </div>
           </div>
 
-          <div className="bg-white " style={{ height: "15%" }}>
+          <div className={"bg-white " + (playerSide !== "white" ? " opacity-50" : '')} style={{ height: "15%" }}>
             <div className="py-1 px-2 text-start d-flex">
               <div className="fa-solid fa-circle text-success pt-1"></div>
               <div className="ps-1 ">Player</div>
               <div className="w-100 text-end pe-1">
-                {playerSide == "white" ? "<" : null}{" "}
+                {playerSide === "white" ? "<" : null}{" "}
               </div>
             </div>
             <div className="d-flex ">
-              <div className={"p-2 w-50 fs-4  " + (playerSide == "white" ? "playerTurn" : "")}>
+              <div className={"p-2 w-50 fs-4  " + (playerSide === "white" ? "playerTurn" : "")}>
                 --:--
               </div>
               <div className="text-start ps-2 w-50  "> {
                 history.map(el => (
-                   el.secondTap?.figure && el.figureColor == 'white' ?
+                   el.secondTap?.figure && el.figureColor === 'white' ?
                   <i className={(renderFigure(el.secondTap?.figure)) + ' pe-1'}></i>
                    : null
                   )
@@ -591,4 +578,5 @@ export default function ChessBoard() {
     </div>
   );
 }
+
 

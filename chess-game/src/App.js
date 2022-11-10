@@ -1,7 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import ChessBoard from "./components/ChessBoard/ChessBoard";
-import Test from "./components/Test";
 
 function App() {
   return (
