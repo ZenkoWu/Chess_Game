@@ -8,17 +8,64 @@ export default function ChessBoard() {
   const maxBoardHeight = 8;
   const letterACodeInASCII = 65;
 
-  let numbersAxis = Array.from( { length: maxBoardHeight },(_, i) => maxBoardHeight - i);
+  let getDotsToMove = (cell, color) => ({
 
-  let lettersAxis = Array.from({ length: maxBoardWidth }, (_, i) =>String.fromCharCode(i + letterACodeInASCII));
+    "king": [
+    {x: cell.x + 1, y: cell.y},
+    {x: cell.x - 1, y: cell.y},
+    {x: cell.x, y: cell.y + 1},
+    {x: cell.x, y: cell.y - 1},
+    {x: cell.x + 1, y: cell.y + 1},
+    {x: cell.x + 1, y: cell.y - 1},
+    {x: cell.x - 1, y: cell.y - 1},
+    {x: cell.x - 1, y: cell.y + 1},
+    ],
+    "bishop": [
+      Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+      Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+      Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+      Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+    ],
+    "rook" : [
+      Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+      Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+      Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+      Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+    ],
+      "queen" : [
+      Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+      Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+      Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+      Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+      Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+      Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+      Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+      Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+    ],
+      "knight" : [
+      {x: cell.x + 1, y: cell.y + 2},
+      {x: cell.x + 1, y: cell.y - 2},
+      {x: cell.x - 1, y: cell.y + 2},
+      {x: cell.x - 1, y: cell.y - 2},
+      {x: cell.x + 2, y: cell.y + 1},
+      {x: cell.x + 2, y: cell.y - 1},
+      {x: cell.x - 2, y: cell.y + 1},
+      {x: cell.x - 2, y: cell.y - 1},
+    ],
+    "pawn": { x: cell.x, y: cell.y + (color === 'black' ? -1 : 1) }
+ 
+  })
 
-  const figureTypes = ["king", "queen", "knight", "bishop", "rook", "pawn"].map(
-    (value) => ({
+  const numbersAxis = Array.from( { length: maxBoardHeight },(_, i) => maxBoardHeight - i);
+
+  const lettersAxis = Array.from({ length: maxBoardWidth }, (_, i) =>String.fromCharCode(i + letterACodeInASCII));
+
+  const figureTypes = ["king", "bishop", "rook", "queen", "knight", "pawn"].map(
+    (value, i) => ({
       value,
       icon: "fa-solid fa-chess-" + value,
-      whereFigureCouldGo: (cell) =>
-        value === "king" ?
-          [
+      whereFigureCouldGo: (cell, color) => ( {
+        "king": [
           {x: cell.x + 1, y: cell.y},
           {x: cell.x - 1, y: cell.y},
           {x: cell.x, y: cell.y + 1},
@@ -27,47 +74,45 @@ export default function ChessBoard() {
           {x: cell.x + 1, y: cell.y - 1},
           {x: cell.x - 1, y: cell.y - 1},
           {x: cell.x - 1, y: cell.y + 1},
-          ]  
-        : value === "bishop" ? 
-          [
-            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
-            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
-            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
-            Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
-          ] 
-        : value === "rook" ?
-          [
-            Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
-            Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
-            Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
-            Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
-          ]
-        : value === "queen" ?
-          [
-            Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
-            Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
-            Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
-            Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
-            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
-            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
-            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
-            Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
-          ]
-        : value === "knight" ? 
-          [
-            {x: cell.x + 1, y: cell.y + 2},
-            {x: cell.x + 1, y: cell.y - 2},
-            {x: cell.x - 1, y: cell.y + 2},
-            {x: cell.x - 1, y: cell.y - 2},
-            {x: cell.x + 2, y: cell.y + 1},
-            {x: cell.x + 2, y: cell.y - 1},
-            {x: cell.x - 2, y: cell.y + 1},
-            {x: cell.x - 2, y: cell.y - 1},
-          ]
-        : null
-    
+        ],
+        "bishop": [
+          Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+          Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+          Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+          Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+        ],
+        "rook" : [
+          Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+          Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+          Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+          Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+        ],
+        "queen" : [
+          Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
+          Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
+          Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
+          Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
+          Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
+          Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
+          Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
+          Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+        ],
+        "knight" : [
+          {x: cell.x + 1, y: cell.y + 2},
+          {x: cell.x + 1, y: cell.y - 2},
+          {x: cell.x - 1, y: cell.y + 2},
+          {x: cell.x - 1, y: cell.y - 2},
+          {x: cell.x + 2, y: cell.y + 1},
+          {x: cell.x + 2, y: cell.y - 1},
+          {x: cell.x - 2, y: cell.y + 1},
+          {x: cell.x - 2, y: cell.y - 1},
+        ],
+        "pawn": { x: cell.x, y: cell.y + (color === 'black' ? -1 : 1) }
+      })[value]
     })
   );
+
+  console.log(figureTypes)
 
 
   const [figures, setFigures] = useState(
@@ -97,7 +142,7 @@ export default function ChessBoard() {
     }))
   );
 
-  let getDefultCellColor = (x, y) => {
+  const getDefultCellColor = (x, y) => {
     return (x % 2 === 0 && y % 2 === 0) || (x % 2 !== 0 && y % 2 !== 0)
       ? "bg-lightColored"
       : "bg-brown";
@@ -133,7 +178,7 @@ export default function ChessBoard() {
     });
   }
 
-  let arrDefaultFigurePosition = [
+  const arrDefaultFigurePosition = [
     { start: 0, xOffsetBetweenFigures: 1, type: "pawn", color: "black", y: 6 },
     { start: 0, xOffsetBetweenFigures: 1, type: "pawn", color: "white", y: 1 },
     { start: 4, xOffsetBetweenFigures: 4, type: "king", color: "black", y: 7 },
@@ -157,10 +202,10 @@ export default function ChessBoard() {
 
   }, []);
 
-  let getFigureById = (id) => figures.find((el) => el.id === id);
+  const getFigureById = (id) => figures.find((el) => el.id === id);
 
-  let renderFigure = (id, shadow) => {
-    let figure = getFigureById(id);
+  const renderFigure = (id, shadow) => {
+    const figure = getFigureById(id);
 
     if (figure) {
       return (
@@ -177,7 +222,7 @@ export default function ChessBoard() {
 
   const [history, setHistory] = useState([]);
 
-  let historyPush = (move) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide }]);
+  const historyPush = (move) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide }]);
 
   const [availableToMove, setAvailableToMove] = useState([]);
 
@@ -209,96 +254,44 @@ export default function ChessBoard() {
   }, [move]);
 
  
-  let getCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)
+  const getCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)
 
-  let getCellId = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.id
+  const getCellId = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.id
 
-  let getFigureIdFromCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.figure
+  const getFigureIdFromCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.figure
   
-  let getFigureByXY = (x, y) => {
-    let figId = cells.find(c => c.x === x && c.y === y)?.figure
-    let fig = figures.find(f => f.id === figId)
+  const getFigureByXY = (x, y) => {
+    const figId = cells.find(c => c.x === x && c.y === y)?.figure
+    const fig = figures.find(f => f.id === figId)
     return fig
   }
 
-  console.log(figureTypes)
-
-  const pointsForRookMove = cell => [
-    Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
-    Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
-    Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
-    Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
-  ]
-
-  const pointsForKnightMove = cell => [
-    {x: cell.x + 1, y: cell.y + 2},
-    {x: cell.x + 1, y: cell.y - 2},
-    {x: cell.x - 1, y: cell.y + 2},
-    {x: cell.x - 1, y: cell.y - 2},
-    {x: cell.x + 2, y: cell.y + 1},
-    {x: cell.x + 2, y: cell.y - 1},
-    {x: cell.x - 2, y: cell.y + 1},
-    {x: cell.x - 2, y: cell.y - 1},
-
-  ]
-
-  const pointsForBishopMove = cell => [
-    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
-    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
-    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
-    Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
-  ]
-
-  const pointsForQueenMove = cell => [
-    ...pointsForRookMove(cell),
-    ...pointsForBishopMove(cell),
-
-  ]
-
-  const pointsForKingMove = cell => [
-    {x: cell.x + 1, y: cell.y},
-    {x: cell.x - 1, y: cell.y},
-    {x: cell.x, y: cell.y + 1},
-    {x: cell.x, y: cell.y - 1},
-    {x: cell.x + 1, y: cell.y + 1},
-    {x: cell.x + 1, y: cell.y - 1},
-    {x: cell.x - 1, y: cell.y - 1},
-    {x: cell.x - 1, y: cell.y + 1},
-  ]
-
  
-  let whereFigureCouldGo = (figure, cell) => {
-    let dots = []
-
+  const whereFigureCouldGo = (figure, cell) => {
+    let dots = [] 
     
+    let pp = figureTypes.find(f => f.value === figure.type)?.whereFigureCouldGo(cell, figure.color)
+
     if (figure?.type === "pawn" && figure.color === "white") {
 
-      let a =  [
-        {x: cell.x, y: cell.y + 2},
-        {x: cell.x, y: cell.y + 1},
-        {x: cell.x + 1, y: cell.y + 1},
-        {x: cell.x - 1, y: cell.y + 1},
-      ]
-      
-      a.map(el => {
-        if (cell.y == 1 && !getCell(el.x, el.y)?.figure && !getCell(el.x, el.y)?.figure) {
-          dots.push(getCellId(el.x, el.y))
-        } else {
-            if (getFigureByXY(el.x, el.y)?.color === 'black') {
-              dots.push(getCellId(el.x, el.y)) 
-            }
-            if (getFigureByXY(el.x, el.y)?.color === 'black') {
-            dots.push(getCellId(el.x, el.y))
-            }
-        }
-        if (getCell(el.x, el.y)?.figure) {
-          return dots; 
-        } 
-           
-        dots.push(getCellId(el.x, el.y))
+      if (cell.y == 1 && !getCell(pp.x, pp.y + 1)?.figure && !getCell(pp.x, pp.y)?.figure) {
+        dots.push(getCellId(pp.x, pp.y + 1))
       } 
+      else {
+        if (getFigureByXY(pp.x + 1, pp.y)?.color === 'black') {
+          dots.push(getCellId(pp.x + 1, pp.y)) 
+        }
+        if (getFigureByXY(pp.x - 1, pp.y)?.color === 'black') {
+          dots.push(getCellId(pp.x - 1, pp.y))
+        }
+      }
+      if (getCell(pp.x, pp.y)?.figure) {
+        return dots; 
+      } 
+          
+      dots.push(getCellId(pp.x, pp.y))
+
         
-      )
        
       // if (cell.y == 1 && !getCell(cell.x, cell.y + 1)?.figure && !getCell(cell.x, cell.y + 2)?.figure) {
       //   dots.push(getCellId(cell.x, cell.y + 2))
@@ -322,32 +315,43 @@ export default function ChessBoard() {
         
 
     } else if (figure?.type === "pawn" && figure.color === "black") {
+
       
-      if(cell.y == 6 && !getCell(cell.x, cell.y - 1)?.figure && !getCell(cell.x, cell.y - 2)?.figure) {
-        dots.push(getCellId(cell.x, cell.y - 2)) 
-      } 
-      else {
-        if (getFigureByXY(cell.x - 1, cell.y - 1)?.color === 'white') {
-          dots.push(getCellId(cell.x - 1, cell.y - 1)) 
+      let pawnPoint =  [
+        {x: cell.x, y: cell.y - 1},
         
+      ]
+
+      pawnPoint.map(el => {
+        if (cell.y == 6 && !getCell(el.x, el.y - 1)?.figure && !getCell(el.x, el.y)?.figure) {
+          dots.push(getCellId(el.x, el.y - 1))
+        } 
+        else {
+            if (getFigureByXY(el.x + 1, el.y)?.color === 'white') {
+              dots.push(getCellId(el.x + 1, el.y)) 
+            }
+            if (getFigureByXY(el.x - 1, el.y)?.color === 'white') {
+            dots.push(getCellId(el.x - 1, el.y))
+            }
         }
-        if (getFigureByXY(cell.x + 1, cell.y - 1)?.color === 'white') {
-          dots.push(getCellId(cell.x + 1, cell.y - 1))
-          
-        }
-      }
-      if (getCell(cell.x, cell.y - 1)?.figure) {
-        return dots; 
+        if (getCell(el.x, el.y)?.figure) {
+          return dots; 
+        } 
+           
+         dots.push(getCellId(el.x, el.y))
       } 
-         
-      dots.push(getCellId(cell.x, cell.y - 1))
+        
+      )
+      
          
     } else {
-      let pushCellsIdWhereFigureCanGo = (x, y, array) => {
+
+
+      const pushCellsIdWhereFigureCanGo = (x, y, array) => {
         if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) 
           return true;
 
-        let figure = getFigureById(getFigureIdFromCell(x, y))
+        const figure = getFigureById(getFigureIdFromCell(x, y))
 
         if (figure) {
           if (figure.color !== playerSide) {
@@ -358,8 +362,7 @@ export default function ChessBoard() {
         array.push(getCellId(x, y));
       }
 
-        figureTypes.find(f => f.value == figure.type)?.whereFigureCouldGo(cell)
-        ?.forEach(el => {
+        pp?.forEach(el => {
           if(Array.isArray(el)) {
             for (let p of el) {
               if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots) ) {
@@ -376,16 +379,16 @@ export default function ChessBoard() {
     return dots;
   };
 
-  let isCellFirstTap = (cell) => cell.id === move.firstTap?.id;
+  const isCellFirstTap = (cell) => cell.id === move.firstTap?.id;
 
-  let canActivateCell = (cell) => {
+  const canActivateCell = (cell) => {
     // функция, подсвечивающая какие фигуры можно нажать для хода
-    let figure = getFigureById(cell.figure);
+    const figure = getFigureById(cell.figure);
     return figure?.color === playerSide && !isCellFirstTap(cell) ? "cellOnFocus" : null;
   };
 
-  let setFigureMoves = (cell) => {
-    let figure = getFigureById(cell.figure);
+  const setFigureMoves = (cell) => {
+    const figure = getFigureById(cell.figure);
 
     if (figure?.color === playerSide) {
       setMove((prev) => ({ ...prev, firstTap: cell }));
