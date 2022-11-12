@@ -292,48 +292,13 @@ export default function ChessBoard() {
       dots.push(getCellId(x, y)) // добавляем точку для хода вперед на одну клетку 
 
         
-    } 
-
-
-    // else if (figure?.type === "pawn" && figure.color === "black") {
-
-      
-    //   let pawnPoint =  [
-    //     {x: cell.x, y: cell.y - 1},
-        
-    //   ]
-
-    //   pawnPoint.map(el => {
-    //     if (cell.y == 6 && !getCell(el.x, el.y - 1)?.figure && !getCell(el.x, el.y)?.figure) {
-    //       dots.push(getCellId(el.x, el.y - 1))
-    //     } 
-    //     else {
-    //         if (getFigureByXY(el.x + 1, el.y)?.color === 'white') {
-    //           dots.push(getCellId(el.x + 1, el.y)) 
-    //         }
-    //         if (getFigureByXY(el.x - 1, el.y)?.color === 'white') {
-    //         dots.push(getCellId(el.x - 1, el.y))
-    //         }
-    //     }
-    //     if (getCell(el.x, el.y)?.figure) {
-    //       return dots; 
-    //     } 
-           
-    //      dots.push(getCellId(el.x, el.y))
-    //   } 
-        
-    //   )
-         
-    // } 
-
-    else if(figure?.type !== 'pawn') {
-
+    } else {
       const pushCellsIdWhereFigureCanGo = (x, y, array) => {
         if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) 
           return true;
 
         const figure = getFigureById(getFigureIdFromCell(x, y))
-        
+
         if (figure) {
           if (figure.color !== playerSide) {
             array.push(getCellId(x, y));
