@@ -64,7 +64,7 @@ export default function ChessBoard() {
     (value, i) => ({
       value,
       icon: "fa-solid fa-chess-" + value,
-      whereFigureCouldGo: (cell, color) => ( {
+      getDotsToMove: (cell, color) => ( {
         "king": [
           {x: cell.x + 1, y: cell.y},
           {x: cell.x - 1, y: cell.y},
@@ -107,7 +107,7 @@ export default function ChessBoard() {
           {x: cell.x - 2, y: cell.y + 1},
           {x: cell.x - 2, y: cell.y - 1},
         ],
-        "pawn": { x: cell.x, y: cell.y + (color === 'black' ? -1 : 1) }
+        "pawn": [cell.x, cell.y + (color === 'black' ? -1 : 1) ]
       })[value]
     })
   );
@@ -216,7 +216,7 @@ export default function ChessBoard() {
 
   };
 
-  const [playerSide, setPlayerSide] = useState("white");
+  const [playerSide, setPlayerSide] = useState("black");
 
   const [move, setMove] = useState({});
 
@@ -270,89 +270,70 @@ export default function ChessBoard() {
   const whereFigureCouldGo = (figure, cell) => {
     let dots = [] 
     
-    let pp = figureTypes.find(f => f.value === figure.type)?.whereFigureCouldGo(cell, figure.color)
+    let figureDots = figureTypes.find(f => f.value === figure.type)?.getDotsToMove(cell, figure.color)
 
-    if (figure?.type === "pawn" && figure.color === "white") {
+    if (figure?.type === "pawn") {
 
-      if (cell.y == 1 && !getCell(pp.x, pp.y + 1)?.figure && !getCell(pp.x, pp.y)?.figure) {
-        dots.push(getCellId(pp.x, pp.y + 1))
+      let [x, y] = figureDots;
+
+      if ((cell.y == 6 || cell.y == 1) && !getCell(x, y + (figure.color === 'black' ? -1 : 1))?.figure && !getCell(x, y)?.figure) {
+        dots.push(getCellId(x, y +(figure.color === 'black' ? -1 : 1))) //добавляем точку для хода на 2 клетки из начального положения
       } 
-      else {
-        if (getFigureByXY(pp.x + 1, pp.y)?.color === 'black') {
-          dots.push(getCellId(pp.x + 1, pp.y)) 
-        }
-        if (getFigureByXY(pp.x - 1, pp.y)?.color === 'black') {
-          dots.push(getCellId(pp.x - 1, pp.y))
-        }
+      if (getFigureByXY(x + 1, y)?.color === (figure.color === 'black' ? 'white' : 'black') ) {
+        dots.push(getCellId(x + 1, y)) // добавляем точку чтобы убить фигуры по диагонали вправо
       }
-      if (getCell(pp.x, pp.y)?.figure) {
-        return dots; 
+      if (getFigureByXY(x - 1, y)?.color === (figure.color === 'black' ? 'white' : 'black')) {
+        dots.push(getCellId(x - 1, y)) // добавляем точку чтобы убить фигуры по диагонали влево 
+      }
+      if (getCell(x, y)?.figure) {
+        return dots; // возвращаем массив если встречаем фигуру впереди
       } 
           
-      dots.push(getCellId(pp.x, pp.y))
+      dots.push(getCellId(x, y)) // добавляем точку для хода вперед на одну клетку 
 
         
-       
-      // if (cell.y == 1 && !getCell(cell.x, cell.y + 1)?.figure && !getCell(cell.x, cell.y + 2)?.figure) {
-      //   dots.push(getCellId(cell.x, cell.y + 2))
-      // } 
-      // else {
-      //     if (getFigureByXY(cell.x + 1, cell.y + 1)?.color === 'black') {
-      //       dots.push(getCellId(cell.x + 1, cell.y + 1)) 
-          
-      //     }
-      //       if (getFigureByXY(cell.x - 1, cell.y + 1)?.color === 'black') {
-      //       dots.push(getCellId(cell.x - 1, cell.y + 1))
-            
-      //       }
-      // } 
-      // if (getCell(cell.x, cell.y + 1)?.figure) {
-      //   return dots; 
-      // } 
-         
-      // dots.push(getCellId(cell.x, cell.y + 1))
-        
-        
+    } 
 
-    } else if (figure?.type === "pawn" && figure.color === "black") {
+
+    // else if (figure?.type === "pawn" && figure.color === "black") {
 
       
-      let pawnPoint =  [
-        {x: cell.x, y: cell.y - 1},
+    //   let pawnPoint =  [
+    //     {x: cell.x, y: cell.y - 1},
         
-      ]
+    //   ]
 
-      pawnPoint.map(el => {
-        if (cell.y == 6 && !getCell(el.x, el.y - 1)?.figure && !getCell(el.x, el.y)?.figure) {
-          dots.push(getCellId(el.x, el.y - 1))
-        } 
-        else {
-            if (getFigureByXY(el.x + 1, el.y)?.color === 'white') {
-              dots.push(getCellId(el.x + 1, el.y)) 
-            }
-            if (getFigureByXY(el.x - 1, el.y)?.color === 'white') {
-            dots.push(getCellId(el.x - 1, el.y))
-            }
-        }
-        if (getCell(el.x, el.y)?.figure) {
-          return dots; 
-        } 
+    //   pawnPoint.map(el => {
+    //     if (cell.y == 6 && !getCell(el.x, el.y - 1)?.figure && !getCell(el.x, el.y)?.figure) {
+    //       dots.push(getCellId(el.x, el.y - 1))
+    //     } 
+    //     else {
+    //         if (getFigureByXY(el.x + 1, el.y)?.color === 'white') {
+    //           dots.push(getCellId(el.x + 1, el.y)) 
+    //         }
+    //         if (getFigureByXY(el.x - 1, el.y)?.color === 'white') {
+    //         dots.push(getCellId(el.x - 1, el.y))
+    //         }
+    //     }
+    //     if (getCell(el.x, el.y)?.figure) {
+    //       return dots; 
+    //     } 
            
-         dots.push(getCellId(el.x, el.y))
-      } 
+    //      dots.push(getCellId(el.x, el.y))
+    //   } 
         
-      )
-      
+    //   )
          
-    } else {
+    // } 
 
+    else if(figure?.type !== 'pawn') {
 
       const pushCellsIdWhereFigureCanGo = (x, y, array) => {
         if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) 
           return true;
 
         const figure = getFigureById(getFigureIdFromCell(x, y))
-
+        
         if (figure) {
           if (figure.color !== playerSide) {
             array.push(getCellId(x, y));
@@ -362,7 +343,7 @@ export default function ChessBoard() {
         array.push(getCellId(x, y));
       }
 
-        pp?.forEach(el => {
+        figureDots?.forEach(el => {
           if(Array.isArray(el)) {
             for (let p of el) {
               if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots) ) {
