@@ -3,6 +3,10 @@
     background-color: rgb(138, 96, 79);
     
   }
+
+.boardBorderColor {
+  background-color: #fede97;
+}
   
   .bg-lightColored {
     background-color: rgb(243, 194, 155);
