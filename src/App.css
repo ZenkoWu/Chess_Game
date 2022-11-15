@@ -20,3 +20,6 @@
   /* padding-top: 15px; */
 }
 
+.playerTurn {
+  background-color: rgba(100, 148, 78, 0.692);
+}
