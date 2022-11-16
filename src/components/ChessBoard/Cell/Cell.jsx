@@ -12,13 +12,13 @@ export const Cell = ({getDefaultCellColor, canActivateCell, cell, isCellFirstTap
       canActivateCell(cell) +
       ' ' +
       (isCellFirstTap(cell) ? 'activeCell ' : '') +
-      (availableToMove.includes(cell.id) && cell.figure
-      ? ' bg-green cursor'
-      :
-        availableToMove.includes(cell.id) 
-        ? ' fa-solid fa-circle green-circle fs-4 cursor'
-        
-        : '')
+      (availableToMove.includes(cell.id) && cell.figure ? 
+        ' bg-green cursor' 
+        :
+        availableToMove.includes(cell.id) ? 
+        ' fa-solid fa-circle green-circle fs-4 cursor' 
+        : 
+        '')
       }
       style={{ width: '11vh', height: '11vh'}}
       onClick={() => setFigureMoves(cell)}

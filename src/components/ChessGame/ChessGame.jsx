@@ -151,27 +151,28 @@ export function ChessGame() {
     
     let figureDots = figureTypes.find(f => f.value === figure.type)?.getDotsToMove(cell, figure.color)
 
-    if (figure?.type === 'pawn') {
+    // if (figure?.type === 'pawn') {
 
-      let [x, y] = figureDots;
+    //   let [x, y] = figureDots;
 
-      if ((cell.y == 6 || cell.y == 1) && !getCell(x, y + (figure.color === 'black' ? -1 : 1))?.figure && !getCell(x, y)?.figure) {
-        dots.push(getCellId(x, y +(figure.color === 'black' ? -1 : 1))) //добавляем точку для хода на 2 клетки из начального положения
-      } 
-      if (getFigureByXY(x + 1, y)?.color === (figure.color === 'black' ? 'white' : 'black') ) {
-        dots.push(getCellId(x + 1, y)) // добавляем точку чтобы убить фигуры по диагонали вправо
-      }
-      if (getFigureByXY(x - 1, y)?.color === (figure.color === 'black' ? 'white' : 'black')) {
-        dots.push(getCellId(x - 1, y)) // добавляем точку чтобы убить фигуры по диагонали влево 
-      }
-      if (getCell(x, y)?.figure) {
-        return dots; // возвращаем массив если встречаем фигуру впереди
-      } 
+    //   if ((cell.y == 6 || cell.y == 1) && !getCell(x, y + (figure.color === 'black' ? -1 : 1))?.figure && !getCell(x, y)?.figure) {
+    //     dots.push(getCellId(x, y +(figure.color === 'black' ? -1 : 1))) //добавляем точку для хода на 2 клетки из начального положения
+    //   } 
+    //   if (getFigureByXY(x + 1, y)?.color === (figure.color === 'black' ? 'white' : 'black') ) {
+    //     dots.push(getCellId(x + 1, y)) // добавляем точку чтобы убить фигуры по диагонали вправо
+    //   }
+    //   if (getFigureByXY(x - 1, y)?.color === (figure.color === 'black' ? 'white' : 'black')) {
+    //     dots.push(getCellId(x - 1, y)) // добавляем точку чтобы убить фигуры по диагонали влево 
+    //   }
+    //   if (getCell(x, y)?.figure) {
+    //     return dots; // возвращаем массив если встречаем фигуру впереди
+    //   } 
           
-      dots.push(getCellId(x, y)) // добавляем точку для хода вперед на одну клетку 
+    //   dots.push(getCellId(x, y)) // добавляем точку для хода вперед на одну клетку 
 
         
-    } else {
+    // } 
+    // else {
       const pushCellsIdWhereFigureCanGo = (x, y, array) => {
         if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) 
           return true;
@@ -186,20 +187,35 @@ export function ChessGame() {
         }
         array.push(getCellId(x, y));
       }
-
-        figureDots?.forEach(el => {
-          if(Array.isArray(el)) {
+      
+        figureDots?.data.forEach(el => {
+          if(figureDots.action == 'c') {
             for (let p of el) {
               if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots)) {
                 break;
               }
             }
-          } else {
+          } else if (figureDots.action == 'k') {
+              pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+          } if (el.action == 'go' && !getCell(el.x, el.y)?.figure) {
+              pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+          } if (el.action == 'go2' && (cell.y == 6 || cell.y == 1) && !getCell(el.x, el.y)?.figure) {
+              pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+          } if (el.action == 'killR' 
+          && getFigureByXY(el.x + 1, el.y)?.color === (figure.color === 'black' ? 'white' : 'black')) {
             pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
-          }
+          } if (el.action == 'killL' 
+          && getFigureByXY(el.x - 1, el.y)?.color === (figure.color === 'black' ? 'white' : 'black'))
+        {
+           pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+
+        }
         })
+
+      // }
+       
   
-    }
+    // }
     return dots;
   };
   
@@ -218,14 +234,14 @@ export function ChessGame() {
   return (
     <div className='row m-0 mw-100 p-2 px-4'>
 
-      <div className=' col-lg-3 col-sm-12 border p-2'>
+      <div className=' col-lg-3 col-sm-12 p-2'>
           <div className='bg-brown opacity-75 p-3 text-light'>
             <div>{'Матч'}</div>
             <div>{matchNumber}</div>
           </div>
       </div>
 
-      <div className='col-lg-6 col-sm-12 border p-2'>
+      <div className='col-lg-6 col-sm-12 p-2'>
         <ChessBoard 
             cells ={cells} 
             isCellFirstTap = {isCellFirstTap} 
@@ -236,7 +252,7 @@ export function ChessGame() {
         />
       </div>
 
-      <div className='col-lg-3 col-sm-12 border p-2'>
+      <div className='col-lg-3 col-sm-12 p-2'>
         <PlayerTurn 
             history={history} 
             renderFigure={renderFigure} 

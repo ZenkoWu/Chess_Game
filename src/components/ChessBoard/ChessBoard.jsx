@@ -17,7 +17,7 @@ export default function ChessBoard({
 
       <div className='row m-0 mw-100 px-4'>
           {lettersAxis.map((item, i) => (
-            <div key={i} className='col fw-bold border'>
+            <div key={i} className='col fw-bold '>
               {item}
             </div>
           ))}
