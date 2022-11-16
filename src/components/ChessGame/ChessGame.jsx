@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { arrDefaultFigurePosition, figureTypes, lettersAxis,
+import { arrDefaultFigurePosition, lettersAxis,
  maxBoardHeight, maxBoardWidth, numbersAxis } from '../../constants/constans';
 import ChessBoard from '../ChessBoard/ChessBoard';
 import './ChessGame.css'
 import { HistoryBoard } from '../HistoryBoard/HistoryBoard';
 import { PlayerTurn } from '../PlayerTurn/PlayerTurn';
+import { figureTypes } from '../../constants/figureTypes';
 
 export function ChessGame() {
 
@@ -91,7 +92,7 @@ export function ChessGame() {
 
       historyPush(move);
       setMove({});
-      setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
+      // setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
 
     } else if (move.firstTap) {
         // count where we can go
@@ -201,8 +202,6 @@ export function ChessGame() {
     }
     return dots;
   };
-
-
   
   const setFigureMoves = (cell) => {
     const figure = getFigureById(cell.figure);
@@ -217,7 +216,7 @@ export function ChessGame() {
   };
 
   return (
-    <div className='row m-0 mw-100 p-2 px-5'>
+    <div className='row m-0 mw-100 p-2 px-4'>
 
       <div className=' col-lg-3 col-sm-12 border p-2'>
           <div className='bg-brown opacity-75 p-3 text-light'>
@@ -263,12 +262,7 @@ export function ChessGame() {
             color='white' 
             textColor='black'
         /> 
-        
       </div>
     </div>
   );
 }
-
-
-// vh %
-// чистые функции
