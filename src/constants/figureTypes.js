@@ -1,4 +1,4 @@
-import { maxBoardHeight, maxBoardWidth } from "./constans";
+import { maxBoardHeight} from "./constans";
 
 const getRookDotsToMove = func => [
     func(i => 0, i => i + 1 ), 
@@ -36,38 +36,14 @@ const getRookDotsToMove = func => [
           {x: cell.x - 1, y: cell.y + 1},
         ],
         'bishop': [
-            ...getBishopDotsToMove(getArrayOfDots)
-        //   getArrayOfDots(i => i + 1, i => i + 1 ), 
-        //   getArrayOfDots(i => -i - 1, i => -i - 1 ), 
-        //   getArrayOfDots(i => -i - 1, i => i + 1 ), 
-        //   getArrayOfDots(i => i + 1, i => -i - 1 ), 
-        //   Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ),  
-        //   Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
-        //   Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
-        //   Array.from({length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+          ...getBishopDotsToMove(getArrayOfDots)
         ],
         'rook' : [
           ...getRookDotsToMove(getArrayOfDots),
-        //   getArrayOfDots(i => 0, i => i + 1 ), 
-        //   getArrayOfDots(i => 0, i => -i - 1 ), 
-        //   getArrayOfDots(i => i + 1, i => 0 ), 
-        //   getArrayOfDots(i => -i - 1, i => 0 ),
-        //   Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
-        //   Array.from( { length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
-        //   Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
-        //   Array.from( { length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
         ],
         'queen' : [
-            ...getBishopDotsToMove(getArrayOfDots),
-            ...getRookDotsToMove(getArrayOfDots),
-        //   Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y + i + 1,}) ),
-        //   Array.from( {length: maxBoardHeight },(_, i) => ({x: cell.x, y: cell.y - i - 1,}) ),
-        //   Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x + i + 1, y: cell.y}) ),
-        //   Array.from( {length: maxBoardWidth },(_, i) => ({x: cell.x - i - 1 , y: cell.y}) ),
-        //   Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y + i + 1}) ), 
-        //   Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y - i - 1}) ), 
-        //   Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x - i - 1, y: cell.y + i + 1}) ), 
-        //   Array.from( {length: maxBoardHeight}, (_, i) => ({x: cell.x + i + 1, y: cell.y - i - 1}) ), 
+          ...getBishopDotsToMove(getArrayOfDots),
+          ...getRookDotsToMove(getArrayOfDots),
         ],
         'knight' : [
           {x: cell.x + 1, y: cell.y + 2},
