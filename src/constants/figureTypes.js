@@ -19,7 +19,7 @@ export const figureTypes = ['king', 'bishop', 'rook', 'queen', 'knight', 'pawn']
     (value) => ({
         value,
         icon: 'fa-solid fa-chess-' + value,
-        getDotsToMove: (cell, color) => {
+        getDotsToMove: (cell, color) => { // ??? cell x y destructure
             
             let getArrayOfDots = (appendX, appendY) => Array.from({length: maxBoardHeight}, (_, i) => 
             ({x: cell.x + appendX(i), y: cell.y + appendY(i)}))
@@ -40,12 +40,12 @@ export const figureTypes = ['king', 'bishop', 'rook', 'queen', 'knight', 'pawn']
                 },
                 'bishop': {
                     action: moveActions.COULD_BE_INTERRUPTED,
-                    data: [...getBishopDotsToMove(getArrayOfDots)]
+                    data: [...getBishopDotsToMove(getArrayOfDots)] // ??? destructure
                 },
                 'rook': {
                     action: moveActions.COULD_BE_INTERRUPTED,
                     data: [
-                        ...getRookDotsToMove(getArrayOfDots),
+                        ...getRookDotsToMove(getArrayOfDots), // ??? destructure
                     ], 
                 }, 
                 'queen': {
@@ -69,29 +69,31 @@ export const figureTypes = ['king', 'bishop', 'rook', 'queen', 'knight', 'pawn']
                         {x: cell.x - 2, y: cell.y - 1},
                     ],
                 },
-                
-                'pawn': {  
+
+                'pawn': {
+                    // ??? action moveActions.MULTI_ACTIONS
                     data: [
-                    {
-                        action: moveActions.PAWN_MOVE,
-                        x: cell.x, 
-                        y: cell.y + (color === 'black' ? -1 : 1)
-                    },
-                    { 
-                        action: moveActions.PAWN_MOVE_TWO_CELLS, 
-                        x: cell.x, 
-                        y: cell.y + (color === 'black' ? -2 : 2)
-                    },
-                    {
-                        action: moveActions.PAWN_KILL_RIGHT, 
-                        x: cell.x + 1, 
-                        y: cell.y + (color === 'black' ? -1 : 1)
-                    },
-                    {
-                        action: moveActions.PAWN_KILL_LEFT, 
-                        x: cell.x - 1, 
-                        y: cell.y + (color === 'black' ? -1 : 1)
-                    },
+                        {
+                            action: moveActions.PAWN_MOVE,
+                            // ??? data: {x, y}
+                            x: cell.x,
+                            y: cell.y + (color === 'black' ? -1 : 1)
+                        },
+                        {
+                            action: moveActions.PAWN_MOVE_TWO_CELLS,
+                            x: cell.x,
+                            y: cell.y + (color === 'black' ? -2 : 2)
+                        },
+                        {
+                            action: moveActions.PAWN_KILL_RIGHT,
+                            x: cell.x + 1,
+                            y: cell.y + (color === 'black' ? -1 : 1)
+                        },
+                        {
+                            action: moveActions.PAWN_KILL_LEFT,
+                            x: cell.x - 1,
+                            y: cell.y + (color === 'black' ? -1 : 1)
+                        },
                     ]
                 }
             })[value]
