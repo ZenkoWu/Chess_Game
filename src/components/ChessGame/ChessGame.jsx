@@ -43,7 +43,7 @@ export function ChessGame() {
     );
 
     const [matchNumber, setMatchNumber] = useState(1);
-    const [playerSide, setPlayerSide] = useState('white');
+    const [playerSide, setPlayerSide] = useState('white'); // ??? sides to constants
     const [move, setMove] = useState({});
     const [history, setHistory] = useState([]);
     const historyPush = (move) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide }]);
@@ -60,21 +60,22 @@ export function ChessGame() {
     useEffect(() => {
         if (move.secondTap) {
 
-        setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
+            setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
 
-        setCells(prev => 
-            prev.map(el => (el.id === move.firstTap.id) ? { ...el, figure: null } :  el)
-        );
+            setCells(prev =>  // do we still need it?
+                prev.map(el => (el.id === move.firstTap.id) ? { ...el, figure: null } :  el)
+            );
 
-        setAvailableToMove([]);
-        historyPush(move);
-        setMove({});
-        // TODO debug 
-        setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
+            setAvailableToMove([]);
+            historyPush(move);
+            setMove({});
+
+            // TODO debug
+            setPlayerSide(prev => prev === 'white' ? 'black' : 'white')
 
         } else if (move.firstTap) {
             // count where we can go
-            setAvailableToMove([...whereFigureCouldGo(getFigureById(move.firstTap.figure), move.firstTap)]);
+            setAvailableToMove([...whereFigureCouldGo(getFigureById(move.firstTap.figure), move.firstTap)]); // spread ???
         }
     }, [move]);
 
@@ -100,15 +101,15 @@ export function ChessGame() {
     
     const canActivateCell = (figureId, cellId) => {
         const figure = getFigureById(figureId);
-        return figure?.color === playerSide && !isCellFirstTap(cellId) ? 'cellOnFocus' : null;
+        return figure?.color === playerSide && !isCellFirstTap(cellId) ? 'cellOnFocus' : null; // ??? return value and name
     };
     
     function setFigureInCell(figId, x, y) {
-        setCells((prev) =>
-        prev.map((el) => ({
-            ...el,
-            figure: el.x === x && el.y === y ? figId : el.figure,
-        }))
+        setCells((prev) => // ??? duplicate figure or not
+            prev.map((el) => ({
+                ...el,
+                figure: el.x === x && el.y === y ? figId : (el.figure !== figId ? el.figure : null),
+            }))
         );
     }
 
@@ -128,8 +129,8 @@ export function ChessGame() {
     };
 
     const getCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)
-    const getCellId = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.id
-    const getFigureIdFromCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.figure
+    const getCellId = (x, y) => getCell(x, y)?.id // ??? why we dont use getCell method
+    const getFigureIdFromCell = (x, y) =>  getCell(x, y)?.figure
     
     const getFigureByXY = (x, y) => {
         const figId = cells.find(c => c.x === x && c.y === y)?.figure
@@ -142,7 +143,7 @@ export function ChessGame() {
         let figureDots = figureTypes.find(f => f.value === figure.type)?.getDotsToMove(cell, figure.color)
 
         const pushCellsIdWhereFigureCanGo = (x, y, array) => {
-            if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) 
+            if(x < 0 || x >= maxBoardWidth || y < 0 || y >= maxBoardHeight) // ??? relocate to getDotsToMove
                 return true;
 
             const figure = getFigureById(getFigureIdFromCell(x, y))
@@ -154,43 +155,48 @@ export function ChessGame() {
                 return true;
             }
             array.push(getCellId(x, y));
+            // ??? return false
         }
         
         figureDots?.data.forEach(el => {
             if(figureDots.action === moveActions.COULD_BE_INTERRUPTED) {
                 for (let p of el) {
-                    if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots)) 
+                    if (pushCellsIdWhereFigureCanGo(p.x, p.y, dots))
                         break;
                 }
-
             } else if (figureDots.action === moveActions.MOVE_FOR_KNIGHT) 
                 pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
-
-
             else {
                 const isCellContainsFigure = (x, y) => getCell(x, y)?.figure
 
                 if (el.action === moveActions.PAWN_MOVE && !isCellContainsFigure(el.x, el.y)) 
-                pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
-
-                const isPawnInitialPosition = (cell.y === 6 || cell.y === 1)
-                
-                if (el.action === moveActions.PAWN_MOVE_TWO_CELLS 
-                    && isPawnInitialPosition 
-                    && !isCellContainsFigure(el.x, el.y + (figure.color === 'black' ? 1 : -1))
-                    ) 
-
                     pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
 
-                // todo 
-                const isActionPawnKillLeft = el.action === moveActions.PAWN_KILL_LEFT 
+                const isPawnInitialPosition = (cell.y === 6 || cell.y === 1)
+                if (
+                    el.action === moveActions.PAWN_MOVE_TWO_CELLS &&
+                    isPawnInitialPosition &&
+                    !isCellContainsFigure(el.x, el.y + (figure.color === 'black' ? 1 : -1))
+                )
+                    pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+
                 const isEnemyFigureColor = getFigureByXY(el.x, el.y)?.color === (figure.color === 'black' ? 'white' : 'black')
-                
+
+                if(isEnemyFigureColor){
+                    const isActionPawnKillLeft = el.action === moveActions.PAWN_KILL_LEFT
+                    const isActionPawnKillRight = el.action === moveActions.PAWN_KILL_RIGHT
+                    if(isActionPawnKillLeft)
+                        pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+                    else if(isActionPawnKillRight)
+                        pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+                }
+                /*
                 if (isActionPawnKillLeft && isEnemyFigureColor)      
                     pushCellsIdWhereFigureCanGo(el.x, el.y, dots)        
 
                 if (el.action === moveActions.PAWN_KILL_RIGHT && isEnemyFigureColor) 
                     pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
+                 */
             }
         })
 
@@ -202,8 +208,7 @@ export function ChessGame() {
 
         if (figure?.color === playerSide) 
             setMove( prev => ({ ...prev, firstTap: cell }));
-        
-        else if (availableToMove.includes(cell.id)) 
+        else if (availableToMove.includes(cell.id))
             setMove( prev => ({ ...prev, secondTap: cell }));
     };
 

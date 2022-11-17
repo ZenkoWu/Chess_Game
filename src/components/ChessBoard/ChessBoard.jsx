@@ -55,7 +55,7 @@ export default function ChessBoard(
                         {cells.map(cell => (
                             <Cell
                                 key={cell.id}
-                                getDefaultCellColor={getDefaultCellColor}
+                                getDefaultCellColor={getDefaultCellColor} // ???
                                 canActivateCell={canActivateCell}
                                 cell={cell}
                                 availableToMove={availableToMove}
