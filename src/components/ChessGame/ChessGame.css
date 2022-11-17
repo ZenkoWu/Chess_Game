@@ -1,6 +1,6 @@
 
 .cellOnFocus:hover, .playerTurn {
-background-color: rgba(100, 148, 78, 0.692);
+  background-color: rgba(100, 148, 78, 0.692);
 }
 
 .cellOnFocus:hover {
