@@ -32,10 +32,10 @@ export function ChessGame() {
 
     const [cells, setCells] = useState(
         Array.from({ length: maxBoardWidth * maxBoardHeight }, (_, i) => ({
-        id: lettersAxis[i % maxBoardWidth] + numbersAxis[Math.floor(i / maxBoardHeight) % maxBoardHeight],
-        figure: null,
-        x: i % maxBoardWidth,
-        y: maxBoardHeight - 1 - (Math.floor(i / maxBoardHeight) % maxBoardHeight),
+            id: lettersAxis[i % maxBoardWidth] + numbersAxis[Math.floor(i / maxBoardHeight) % maxBoardHeight],
+            figure: null,
+            x: i % maxBoardWidth,
+            y: maxBoardHeight - 1 - (Math.floor(i / maxBoardHeight) % maxBoardHeight),
         }))
     );
 
@@ -63,11 +63,11 @@ export function ChessGame() {
             setMove({});
 
             // TODO debug 
-            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
-            } else if (move.firstTap) {
-                // count where we can go
-                setAvailableToMove([...whereFigureCouldGo(getFigureById(move.firstTap.figure), move.firstTap)]);
+        } else if (move.firstTap) {
+            // count where we can go
+            setAvailableToMove(whereFigureCouldGo(getFigureById(move.firstTap.figure), move.firstTap));
         }
     }, [move]);
 

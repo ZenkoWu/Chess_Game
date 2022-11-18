@@ -40,7 +40,7 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
             
             return ({
                 [pieces.KING]: {
-                    action: moveActions.COULD_BE_INTERRUPTED,
+                    action: moveActions.MOVE_FOR_KNIGHT,
                     data: [
                         {x: cell.x + 1, y: cell.y},
                         {x: cell.x - 1, y: cell.y},
@@ -55,14 +55,12 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
 
                 [pieces.BISHOP]: {
                     action: moveActions.COULD_BE_INTERRUPTED,
-                    data: [...getBishopDotsToMove(getArrayOfDots)]
+                    data: getBishopDotsToMove(getArrayOfDots)
                 },
 
                 [pieces.ROOK]: {
                     action: moveActions.COULD_BE_INTERRUPTED,
-                    data: [
-                        ...getRookDotsToMove(getArrayOfDots),
-                    ], 
+                    data: getRookDotsToMove(getArrayOfDots),
                 }, 
 
                 [pieces.QUEEN]: {
@@ -115,3 +113,4 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
         }
     })
 );
+
