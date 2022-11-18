@@ -1,4 +1,4 @@
-import { maxBoardHeight} from './constans';
+import { maxBoardHeight, maxBoardWidth} from './constans';
 import { moveActions } from './moveActions';
 
 export const pieces = {
@@ -29,6 +29,23 @@ const getBishopDotsToMove = func => [
     func(i => i + 1, i => -i - 1 ),
 ]
 
+
+
+const limitDotsCountToMove = (action, arr) => {
+    let filterConditions = (x, y) => (x >= 0 && x < maxBoardWidth) && (y >= 0 && y < maxBoardHeight)
+
+    if(action === moveActions.MOVE_FOR_KNIGHT)
+        return arr.filter(el => filterConditions(el.x, el.y))
+        
+    else if(action === moveActions.MULTI_ACTION)
+        return arr.filter(el => filterConditions(el.data.x, el.data.y))
+    
+    else if(action === moveActions.COULD_BE_INTERRUPTED)
+        return arr.map(el => el.filter(el => filterConditions(el.x, el.y)))
+
+    return arr;
+}
+
 export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEEN, pieces.KNIGHT, pieces.PAWN].map(
     (value) => ({
         value,
@@ -36,10 +53,11 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
         getDotsToMove: (cell, color) => {
             const {x, y} = cell
 
-            let getArrayOfDots = (appendX, appendY) => Array.from({length: maxBoardHeight}, (_, i) => 
-            ({x: x + appendX(i), y: y + appendY(i)}))
+            let getArrayOfDots = (appendX, appendY) => Array.from({length: maxBoardHeight}, (_, i) => (
+                {x: x + appendX(i), y: y + appendY(i)}
+            ))
             
-            return ({
+            let dotsToMove = {
                 [pieces.KING]: {
                     action: moveActions.MOVE_FOR_KNIGHT,
                     data: [
@@ -83,34 +101,50 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
                         {x: x + 2, y: y - 1},
                         {x: x - 2, y: y + 1},
                         {x: x - 2, y: y - 1},
-                    ],
+                    ]
                 },
 
-                [pieces.PAWN]: {  
+                [pieces.PAWN]: {
+                    action: moveActions.MULTI_ACTION,  
                     data: [
                         {
                             action: moveActions.PAWN_MOVE,
-                            x: x, 
-                            y: y + (color === colors.BLACK ? -1 : 1)
+                            data: {
+                                x: x, 
+                                y: y + (color === colors.BLACK ? -1 : 1)
+                            }
+                            
                         },
                         { 
                             action: moveActions.PAWN_MOVE_TWO_CELLS, 
-                            x: x, 
-                            y: y + (color === colors.BLACK ? -2 : 2)
+                            data: {
+                                x: x, 
+                                y: y + (color === colors.BLACK ? -2 : 2)
+                            }
                         },
                         {
                             action: moveActions.PAWN_KILL_RIGHT, 
-                            x: x + 1, 
-                            y: y + (color === colors.BLACK ? -1 : 1)
+                            data: {
+                                x: x + 1, 
+                                y: y + (color === colors.BLACK ? -1 : 1)
+                            }
                         },
                         {
                             action: moveActions.PAWN_KILL_LEFT, 
-                            x: x - 1, 
-                            y: y + (color === colors.BLACK ? -1 : 1)
+                            data: {
+                                x: x - 1, 
+                                y: y + (color === colors.BLACK ? -1 : 1)
+                            }
                         },
                     ]
                 }
-            })[value]
+            }
+           
+             Object.keys(dotsToMove).forEach(k => 
+                dotsToMove[k].data = limitDotsCountToMove(dotsToMove[k]?.action, dotsToMove[k]?.data)
+            )
+
+            return dotsToMove[value]
         }
     })
 );

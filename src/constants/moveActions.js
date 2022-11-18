@@ -4,7 +4,8 @@ export const moveActions = {
     PAWN_MOVE: 'pawnMove',
     PAWN_MOVE_TWO_CELLS: 'pawnMoveTwoCells',
     MOVE_FOR_KNIGHT: 'moveForKnight',
-    COULD_BE_INTERRUPTED: 'couldBeInterrupted'
+    COULD_BE_INTERRUPTED: 'couldBeInterrupted',
+    MULTI_ACTION: 'multiAction'
 
 
 
