@@ -36,11 +36,6 @@ export default function ChessBoard(
         setFigureMoves 
     }) {
 
-    const getDefaultCellColor = (x, y) => 
-        (x % 2 === 0 && y % 2 === 0) || (x % 2 !== 0 && y % 2 !== 0)
-        ? 'bg-lightColored'
-        : 'bg-brown';
-
     return (
         <div className='boardBorderColor'>
 
@@ -55,7 +50,6 @@ export default function ChessBoard(
                         {cells.map(cell => (
                             <Cell
                                 key={cell.id}
-                                getDefaultCellColor={getDefaultCellColor}
                                 canActivateCell={canActivateCell}
                                 cell={cell}
                                 availableToMove={availableToMove}

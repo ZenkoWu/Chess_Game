@@ -1,8 +1,7 @@
 import sword from '../../../imgs/sword-svgrepo-com.svg'
 
 export const Cell=(
-    {
-        getDefaultCellColor, 
+    { 
         canActivateCell, 
         cell, 
         isCellFirstTap, 
@@ -10,6 +9,11 @@ export const Cell=(
         setFigureMoves,
         getFigureClasses
     }) => {
+
+    const getDefaultCellColor = (x, y) => 
+    (x % 2 === 0 && y % 2 === 0) || (x % 2 !== 0 && y % 2 !== 0)
+    ? 'bg-lightColored'
+    : 'bg-brown';
 
     const {id, x, y, figure} = cell
     const isIncludesCellIdToMove = availableToMove.includes(id) 

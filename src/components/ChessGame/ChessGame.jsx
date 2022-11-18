@@ -91,10 +91,9 @@ export function ChessGame() {
 
     const isCellFirstTap = (cellId) => cellId === move.firstTap?.id;
     
-    const canActivateCell = (figureId, cellId) => {
-        const figure = getFigureById(figureId);
-        return figure?.color === playerSide && !isCellFirstTap(cellId) ? 'cellOnFocus' : null;
-    };
+    const canActivateCell = (figureId, cellId) => 
+        getFigureById(figureId)?.color === playerSide && !isCellFirstTap(cellId) ? 'cellOnFocus' : null;
+    
     
     function setFigureInCell(figId, x, y) {
         setCells((prev) =>
