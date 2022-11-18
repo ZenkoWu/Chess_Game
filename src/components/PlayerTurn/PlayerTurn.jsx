@@ -1,11 +1,12 @@
+import { colors } from "../../constants/figureTypes"
 
 export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side}) => {
     const placeholder = '--:--'
     const killedFigures = history.filter(el => el.secondTap?.figure && el.figureColor === side)
      
     const style = {
-        black: {bgColor: 'black', color: 'white'},
-        white: {bgColor: 'white', color: 'black'},
+        black: {bgColor: colors.BLACK, color: colors.WHITE},
+        white: {bgColor: colors.WHITE, color: colors.BLACK},
     }
     return (
         <div className={`bg-${style[side].bgColor} text-${style[side].color} ` + (!isPlayerTurn && 'opacity-50')}>
