@@ -63,7 +63,7 @@ export function ChessGame() {
             setMove({});
 
             // TODO debug 
-            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
         } else if (move.firstTap) {
             // count where we can go
@@ -160,26 +160,33 @@ export function ChessGame() {
                 const {x, y} = el.data
                 const isCellContainsFigure = (x, y) => getCell(x, y)?.figure
 
-                if (el.action === moveActions.PAWN_MOVE && !isCellContainsFigure(x, y)) 
+                const isActionPawnMove = el.action === moveActions.PAWN_MOVE
+                if (isActionPawnMove && !isCellContainsFigure(x, y)) 
                     pushCellsIdWhereFigureCanGo(x, y, dots)
 
                 const isPawnInitialPosition = (cell.y === 6 || cell.y === 1)
-                if (el.action === moveActions.PAWN_MOVE_TWO_CELLS && 
+                const isActionPawnMoveTwo = el.action === moveActions.PAWN_MOVE_TWO_CELLS
+
+                if ( 
+                    isActionPawnMoveTwo && 
                     isPawnInitialPosition && 
                     !isCellContainsFigure(x, y + (figure.color === colors.BLACK ? 1 : -1))
                 ) 
                     pushCellsIdWhereFigureCanGo(x, y, dots)
 
-                // todo 
-                const isActionPawnKillLeft = el.action === moveActions.PAWN_KILL_LEFT 
                 const isEnemyFigureColor = getFigureByXY(x, y)?.color === (figure.color === colors.BLACK ? colors.WHITE : colors.BLACK)
-                
-                if (isActionPawnKillLeft && isEnemyFigureColor)      
-                    pushCellsIdWhereFigureCanGo(x, y, dots)        
+                if(isEnemyFigureColor){
+                    const isActionPawnKillLeft = el.action === moveActions.PAWN_KILL_LEFT 
+                    const isActionPawnKillRight = el.action === moveActions.PAWN_KILL_RIGHT
 
-                if (el.action === moveActions.PAWN_KILL_RIGHT && isEnemyFigureColor) 
-                    pushCellsIdWhereFigureCanGo(x, y, dots)
+                    if (isActionPawnKillLeft)      
+                        pushCellsIdWhereFigureCanGo(x, y, dots)        
+                
+                    if (isActionPawnKillRight) 
+                        pushCellsIdWhereFigureCanGo(x, y, dots)
+                }
             }
+                
         })
 
         return dots;
