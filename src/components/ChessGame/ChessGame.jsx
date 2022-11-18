@@ -121,11 +121,11 @@ export function ChessGame() {
     };
 
     const getCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)
-    const getCellId = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.id
-    const getFigureIdFromCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)?.figure
+    const getCellId = (x, y) => getCell(x, y).id
+    const getFigureIdFromCell = (x, y) => getCell(x, y).figure
     
     const getFigureByXY = (x, y) => {
-        const figId = cells.find(c => c.x === x && c.y === y)?.figure
+        const figId = getFigureIdFromCell(x, y)
         return figures.find(f => f.id === figId)
     }
 
