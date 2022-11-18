@@ -32,7 +32,7 @@ export const Cell=(
                     ''
                 )
             }
-            style={{width: '11vh', height: '11vh'}}
+            style={{width: '4.1rem', height: '4.1rem'}}
             onClick={() => setFigureMoves(cell)}
         >
             { isIncludesCellIdToMove && figure && <img src={sword} width='50px' /> }

@@ -29,7 +29,7 @@ export function ChessGame() {
         ).split(' ')[i % (maxBoardWidth * 2)],
         }))
     );
-console.log(figures)
+
     const [cells, setCells] = useState(
         Array.from({ length: maxBoardWidth * maxBoardHeight }, (_, i) => ({
         id: lettersAxis[i % maxBoardWidth] + numbersAxis[Math.floor(i / maxBoardHeight) % maxBoardHeight],
@@ -58,12 +58,6 @@ console.log(figures)
         if (move.secondTap) {
 
             setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
-
-            // todo 
-            setCells(prev => 
-                prev.map(el => (el.id === move.firstTap.id) ? { ...el, figure: null } : el)
-            );
-
             setAvailableToMove([]);
             historyPush(move);
             setMove({});
@@ -106,7 +100,7 @@ console.log(figures)
         setCells((prev) =>
             prev.map((el) => ({
                 ...el,
-                figure: el.x === x && el.y === y ? figId : el.figure,
+                figure: el.x === x && el.y === y ? figId : (el.figure !== figId ? el.figure : null)
             }))
         );
     }
