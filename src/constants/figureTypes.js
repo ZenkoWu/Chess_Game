@@ -34,22 +34,23 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
         value,
         icon: 'fa-solid fa-chess-' + value,
         getDotsToMove: (cell, color) => {
-            
+            const {x, y} = cell
+
             let getArrayOfDots = (appendX, appendY) => Array.from({length: maxBoardHeight}, (_, i) => 
-            ({x: cell.x + appendX(i), y: cell.y + appendY(i)}))
+            ({x: x + appendX(i), y: y + appendY(i)}))
             
             return ({
                 [pieces.KING]: {
                     action: moveActions.MOVE_FOR_KNIGHT,
                     data: [
-                        {x: cell.x + 1, y: cell.y},
-                        {x: cell.x - 1, y: cell.y},
-                        {x: cell.x, y: cell.y + 1},
-                        {x: cell.x, y: cell.y - 1},
-                        {x: cell.x + 1, y: cell.y + 1},
-                        {x: cell.x + 1, y: cell.y - 1},
-                        {x: cell.x - 1, y: cell.y - 1},
-                        {x: cell.x - 1, y: cell.y + 1},
+                        {x: x + 1, y: y},
+                        {x: x - 1, y: y},
+                        {x: x, y: y + 1},
+                        {x: x, y: y - 1},
+                        {x: x + 1, y: y + 1},
+                        {x: x + 1, y: y - 1},
+                        {x: x - 1, y: y - 1},
+                        {x: x - 1, y: y + 1},
                     ]
                 },
 
@@ -74,14 +75,14 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
                 [pieces.KNIGHT]: {
                     action: moveActions.MOVE_FOR_KNIGHT,
                     data: [
-                        {x: cell.x + 1, y: cell.y + 2},
-                        {x: cell.x + 1, y: cell.y - 2},
-                        {x: cell.x - 1, y: cell.y + 2},
-                        {x: cell.x - 1, y: cell.y - 2},
-                        {x: cell.x + 2, y: cell.y + 1},
-                        {x: cell.x + 2, y: cell.y - 1},
-                        {x: cell.x - 2, y: cell.y + 1},
-                        {x: cell.x - 2, y: cell.y - 1},
+                        {x: x + 1, y: y + 2},
+                        {x: x + 1, y: y - 2},
+                        {x: x - 1, y: y + 2},
+                        {x: x - 1, y: y - 2},
+                        {x: x + 2, y: y + 1},
+                        {x: x + 2, y: y - 1},
+                        {x: x - 2, y: y + 1},
+                        {x: x - 2, y: y - 1},
                     ],
                 },
 
@@ -89,23 +90,23 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
                     data: [
                         {
                             action: moveActions.PAWN_MOVE,
-                            x: cell.x, 
-                            y: cell.y + (color === colors.BLACK ? -1 : 1)
+                            x: x, 
+                            y: y + (color === colors.BLACK ? -1 : 1)
                         },
                         { 
                             action: moveActions.PAWN_MOVE_TWO_CELLS, 
-                            x: cell.x, 
-                            y: cell.y + (color === colors.BLACK ? -2 : 2)
+                            x: x, 
+                            y: y + (color === colors.BLACK ? -2 : 2)
                         },
                         {
                             action: moveActions.PAWN_KILL_RIGHT, 
-                            x: cell.x + 1, 
-                            y: cell.y + (color === colors.BLACK ? -1 : 1)
+                            x: x + 1, 
+                            y: y + (color === colors.BLACK ? -1 : 1)
                         },
                         {
                             action: moveActions.PAWN_KILL_LEFT, 
-                            x: cell.x - 1, 
-                            y: cell.y + (color === colors.BLACK ? -1 : 1)
+                            x: x - 1, 
+                            y: y + (color === colors.BLACK ? -1 : 1)
                         },
                     ]
                 }
