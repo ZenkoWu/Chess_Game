@@ -146,6 +146,7 @@ export function ChessGame() {
                 return true;
             }
             array.push(getCellId(x, y));
+            return false;
         }
         
         figureDots?.data.forEach(el => {
