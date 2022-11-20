@@ -61,22 +61,20 @@ export function ChessGame() {
             setAvailableToMove([]);
             historyPush(move);
             
-            // castling short and long
-            if (
-                getFigureById(move.firstTap.figure).type === pieces.KING
-                && getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x + 2, move.firstTap.y)
-            )
+            // castling for rook
+            const king = getFigureById(move.firstTap.figure).type === pieces.KING
+            const dotOfShortCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x + 2, move.firstTap.y)
+            const dotOfLongCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x - 2, move.firstTap.y)
+
+            if (king && dotOfShortCastling)
                 setFigureInCell(getFigureIdFromCell(move.firstTap?.x + 3, move.firstTap?.y), move.firstTap.x + 1, move.firstTap.y)
-            else if (
-                getFigureById(move.firstTap.figure).type === pieces.KING
-                && getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x - 2, move.firstTap.y)
-            )
+            else if (king && dotOfLongCastling)
                 setFigureInCell(getFigureIdFromCell(move.firstTap?.x - 4, move.firstTap?.y), move.firstTap.x - 1, move.firstTap.y)
 
             setMove({});
     
             // TODO debug 
-            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
         } else if (move.firstTap) {
             // count where we can go
