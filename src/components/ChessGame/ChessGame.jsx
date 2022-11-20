@@ -60,21 +60,13 @@ export function ChessGame() {
             setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
             setAvailableToMove([]);
             historyPush(move);
-            
-            // castling for rook
-            const king = getFigureById(move.firstTap.figure).type === pieces.KING
-            const dotOfShortCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x + 2, move.firstTap.y)
-            const dotOfLongCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x - 2, move.firstTap.y)
-
-            if (king && dotOfShortCastling)
-                setFigureInCell(getFigureIdFromCell(move.firstTap?.x + 3, move.firstTap?.y), move.firstTap.x + 1, move.firstTap.y)
-            else if (king && dotOfLongCastling)
-                setFigureInCell(getFigureIdFromCell(move.firstTap?.x - 4, move.firstTap?.y), move.firstTap.x - 1, move.firstTap.y)
+        
+            setRookPositionWhenCastling(move)  
 
             setMove({});
     
             // TODO debug 
-            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
         } else if (move.firstTap) {
             // count where we can go
@@ -137,6 +129,19 @@ export function ChessGame() {
     const getFigureByXY = (x, y) => {
         const figId = getFigureIdFromCell(x, y)
         return figures.find(f => f.id === figId)
+    }
+
+    const setRookPositionWhenCastling = (move) => {
+        const king = getFigureById(move.firstTap.figure).type === pieces.KING
+        const dotOfShortCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x + 2, move.firstTap.y)
+        const dotOfLongCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x - 2, move.firstTap.y)
+
+        if (king && dotOfShortCastling)
+            setFigureInCell(getFigureIdFromCell(move.firstTap?.x + 3, move.firstTap?.y), move.firstTap.x + 1, move.firstTap.y)
+        else if (king && dotOfLongCastling)
+            setFigureInCell(getFigureIdFromCell(move.firstTap?.x - 4, move.firstTap?.y), move.firstTap.x - 1, move.firstTap.y)
+
+
     }
 
     const whereFigureCouldGo = (figure, cell) => {
