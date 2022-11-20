@@ -59,17 +59,31 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
             
             let dotsToMove = {
                 [pieces.KING]: {
-                    action: moveActions.MOVE_FOR_KNIGHT,
+                    action: moveActions.KING_ACTIONS,
                     data: [
-                        {x: x + 1, y: y},
-                        {x: x - 1, y: y},
-                        {x: x, y: y + 1},
-                        {x: x, y: y - 1},
-                        {x: x + 1, y: y + 1},
-                        {x: x + 1, y: y - 1},
-                        {x: x - 1, y: y - 1},
-                        {x: x - 1, y: y + 1},
+                        {
+                            action: moveActions.MOVE_FOR_KING,
+                            data: [
+                                {x: x + 1, y: y},
+                                {x: x - 1, y: y},
+                                {x: x, y: y + 1},
+                                {x: x, y: y - 1},
+                                {x: x + 1, y: y + 1},
+                                {x: x + 1, y: y - 1},
+                                {x: x - 1, y: y - 1},
+                                {x: x - 1, y: y + 1},
+                            ]
+                        },
+                        {
+                            action: moveActions.SHORT_CASTLING,
+                            data: {x: x + 2, y: y}
+                        },
+                        {
+                            action: moveActions.LONG_CASTLING,
+                            data: {x: x - 2, y: y}
+                        }
                     ]
+                    
                 },
 
                 [pieces.BISHOP]: {
@@ -105,7 +119,7 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
                 },
 
                 [pieces.PAWN]: {
-                    action: moveActions.MULTI_ACTION,  
+                    action: moveActions.PAWN_ACTIONS,  
                     data: [
                         {
                             action: moveActions.PAWN_MOVE,

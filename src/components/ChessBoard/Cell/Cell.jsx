@@ -12,8 +12,8 @@ export const Cell=(
 
     const getDefaultCellColor = (x, y) => 
     (x % 2 === 0 && y % 2 === 0) || (x % 2 !== 0 && y % 2 !== 0)
-    ? 'bg-lightColored'
-    : 'bg-brown';
+    ? 'bg-brown'
+    : 'bg-lightColored';
 
     const {id, x, y, figure} = cell
     const isIncludesCellIdToMove = availableToMove.includes(id) 

@@ -60,8 +60,21 @@ export function ChessGame() {
             setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
             setAvailableToMove([]);
             historyPush(move);
-            setMove({});
+            
+            // castling short and long
+            if (
+                getFigureById(move.firstTap.figure).type === pieces.KING
+                && getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x + 2, move.firstTap.y)
+            )
+                setFigureInCell(getFigureIdFromCell(move.firstTap?.x + 3, move.firstTap?.y), move.firstTap.x + 1, move.firstTap.y)
+            else if (
+                getFigureById(move.firstTap.figure).type === pieces.KING
+                && getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x - 2, move.firstTap.y)
+            )
+                setFigureInCell(getFigureIdFromCell(move.firstTap?.x - 4, move.firstTap?.y), move.firstTap.x - 1, move.firstTap.y)
 
+            setMove({});
+    
             // TODO debug 
             setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
@@ -132,7 +145,7 @@ export function ChessGame() {
         let dots = [] 
         
         let figureDots = figureTypes.find(f => f.value === figure.type)?.getDotsToMove(cell, figure.color)
-
+    
         const pushCellsIdWhereFigureCanGo = (x, y, array) => {
             const figure = getFigureById(getFigureIdFromCell(x, y))
 
@@ -147,7 +160,7 @@ export function ChessGame() {
         }
         
         figureDots?.data.forEach(el => {
-            if(figureDots.action === moveActions.COULD_BE_INTERRUPTED) {
+            if (figureDots.action === moveActions.COULD_BE_INTERRUPTED) {
                 for (let p of el) {
                     if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots)) 
                         break;
@@ -155,8 +168,40 @@ export function ChessGame() {
 
             } else if (figureDots.action === moveActions.MOVE_FOR_KNIGHT) 
                 pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
-                
-            else if (figureDots.action === moveActions.MULTI_ACTION) {
+
+            else if (figureDots.action === moveActions.KING_ACTIONS) {
+                if (el.action === moveActions.MOVE_FOR_KING) 
+                    el.data.forEach(d => pushCellsIdWhereFigureCanGo(d.x, d.y, dots))
+
+                else {
+                    const wasKingMoved = history.find(el =>
+                        getFigureById(el.firstTap.figure).type === pieces.KING 
+                        && el.figureColor === playerSide
+                    )
+                    
+                    const isCellContainsFigure = (x, y) => getCell(x, y)?.figure
+                    if (el.action === moveActions.SHORT_CASTLING) {
+                        const wasRightRookMoved = history.find(h => getCellId(h.firstTap.x, h.firstTap.y) === getCellId(el.data.x + 1, el.data.y)) //H1, H8
+                        
+                        !wasKingMoved && 
+                        !wasRightRookMoved && 
+                        !isCellContainsFigure(el.data.x - 1, el.data.y) && 
+                        pushCellsIdWhereFigureCanGo(el.data.x, el.data.y, dots)
+                    }
+                    
+                    if (el.action === moveActions.LONG_CASTLING) {
+                        const wasLeftRookMoved = history.find(h => getCellId(h.firstTap.x, h.firstTap.y) === getCellId(el.data.x - 2, el.data.y)) //A1, A8
+                        
+                        !wasKingMoved && 
+                        !wasLeftRookMoved && 
+                        !isCellContainsFigure(el.data.x + 1, el.data.y) &&
+                        !isCellContainsFigure(el.data.x - 1, el.data.y) &&  
+                        pushCellsIdWhereFigureCanGo(el.data.x, el.data.y, dots)    
+                    }   
+                }  
+            }
+
+            else if (figureDots.action === moveActions.PAWN_ACTIONS) {
                 const {x, y} = el.data
                 const isCellContainsFigure = (x, y) => getCell(x, y)?.figure
 

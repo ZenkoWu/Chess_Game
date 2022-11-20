@@ -5,7 +5,11 @@ export const moveActions = {
     PAWN_MOVE_TWO_CELLS: 'pawnMoveTwoCells',
     MOVE_FOR_KNIGHT: 'moveForKnight',
     COULD_BE_INTERRUPTED: 'couldBeInterrupted',
-    MULTI_ACTION: 'multiAction'
+    PAWN_ACTIONS: 'pawnActions',
+    MOVE_FOR_KING: 'moveForKing',
+    KING_ACTIONS: 'kingActions',
+    SHORT_CASTLING: 'shortCaslting',
+    LONG_CASTLING: 'longCaslting',
 
 
 
