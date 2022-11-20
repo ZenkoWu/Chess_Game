@@ -21,16 +21,3 @@
 .cursor {
   cursor: pointer;
 }
-
-.moda {
-  position: absolute;
-  z-index: 20;
-  left: 150px;
-  top: 170px;
-  background-color: #f6c99a;
-  box-shadow: 3px 2px 10px rgb(36, 34, 34);
-}
-
-.fs-100 {
-  font-size: 110px;
-}

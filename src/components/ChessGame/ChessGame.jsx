@@ -54,7 +54,7 @@ export function ChessGame() {
 
     }, []);
 
-    const [modalWindow, setModalWindow] = useState(false)
+    const [modalWindow, setModalWindow] = useState({isOpened: false})
 
     useEffect(() => {
         if (move.secondTap) {
@@ -68,8 +68,7 @@ export function ChessGame() {
             const isPawn = getFigureById(move.firstTap.figure).type === pieces.PAWN
             const isBoardEnd = move.secondTap.y === 7 || move.secondTap.y === 0
             if ( isPawn && isBoardEnd) {
-                setModalWindow(true)
-                changePawnType(move) 
+                setModalWindow({isOpened: true, figId: move.firstTap.figure})
             }
 
             setMove({});
@@ -118,13 +117,20 @@ export function ChessGame() {
 
     const getFigureById = (id) => figures.find((el) => el.id === id);
 
-    const getFigureClasses = (id, shadow) => {
+    const getFigureClasses = (id, shadow, type, color) => {
         const figure = getFigureById(id);
 
         if (figure) {
             return (
                 figureTypes.find((it) => it.value === figure.type)?.icon + ' text-' + figure.color +
                 (figure.color === colors.WHITE && shadow ? ' figureShadow' : '')
+            );
+        } 
+        
+        else if (type) {
+            return (
+                figureTypes.find((it) => it.value === type)?.icon + ' text-' + color +
+                (color === colors.WHITE && shadow ? ' figureShadow' : '')
             );
         }
 
@@ -149,19 +155,6 @@ export function ChessGame() {
             setFigureInCell(getFigureIdFromCell(move.firstTap?.x + 3, move.firstTap?.y), move.firstTap.x + 1, move.firstTap.y)
         else if (isKing && dotOfLongCastling)
             setFigureInCell(getFigureIdFromCell(move.firstTap?.x - 4, move.firstTap?.y), move.firstTap.x - 1, move.firstTap.y)
-
-
-    }
-
-    const changePawnType = (move) => {
-                setFigures(prev => 
-                    prev.map(fig => (
-                        {
-                            ...fig, 
-                            type: move.firstTap.figure === fig.id ? 'rook' : fig.type
-                        }
-                    ))
-                )
     }
 
     const whereFigureCouldGo = (figure, cell) => {
@@ -189,14 +182,16 @@ export function ChessGame() {
                         break;
                 }
 
-            } else if (figureDots.action === moveActions.MOVE_FOR_KNIGHT) 
+            } 
+            
+            else if (figureDots.action === moveActions.MOVE_FOR_KNIGHT) 
                 pushCellsIdWhereFigureCanGo(el.x, el.y, dots)
 
             else if (figureDots.action === moveActions.KING_ACTIONS) {
                 if (el.action === moveActions.MOVE_FOR_KING) 
                     el.data.forEach(d => pushCellsIdWhereFigureCanGo(d.x, d.y, dots))
 
-                else {
+                else if (el.action === moveActions.SHORT_CASTLING || el.action === moveActions.LONG_CASTLING) {
                     const wasKingMoved = history.find(el =>
                         getFigureById(el.firstTap.figure).type === pieces.KING 
                         && el.figureColor === playerSide
@@ -204,22 +199,24 @@ export function ChessGame() {
                     
                     const isCellContainsFigure = (x, y) => getCell(x, y)?.figure
                     if (el.action === moveActions.SHORT_CASTLING) {
-                        const wasRightRookMoved = history.find(h => getCellId(h.firstTap.x, h.firstTap.y) === getCellId(el.data.x + 1, el.data.y)) //H1, H8
+                        const wasRightRookMoved = history.find(h => 
+                            getCellId(h.firstTap.x, h.firstTap.y) === getCellId(el.data.x + 1, el.data.y)) //H1, H8
                         
                         !wasKingMoved && 
                         !wasRightRookMoved && 
                         !isCellContainsFigure(el.data.x - 1, el.data.y) && 
-                        pushCellsIdWhereFigureCanGo(el.data.x, el.data.y, dots)
+                        pushCellsIdWhereFigureCanGo(el.data.x, el.data.y, dots);
                     }
                     
                     if (el.action === moveActions.LONG_CASTLING) {
-                        const wasLeftRookMoved = history.find(h => getCellId(h.firstTap.x, h.firstTap.y) === getCellId(el.data.x - 2, el.data.y)) //A1, A8
+                        const wasLeftRookMoved = history.find(h => 
+                            getCellId(h.firstTap.x, h.firstTap.y) === getCellId(el.data.x - 2, el.data.y)) //A1, A8
                         
                         !wasKingMoved && 
                         !wasLeftRookMoved && 
                         !isCellContainsFigure(el.data.x + 1, el.data.y) &&
                         !isCellContainsFigure(el.data.x - 1, el.data.y) &&  
-                        pushCellsIdWhereFigureCanGo(el.data.x, el.data.y, dots)    
+                        pushCellsIdWhereFigureCanGo(el.data.x, el.data.y, dots);   
                     }   
                 }  
             }
@@ -269,9 +266,28 @@ export function ChessGame() {
             setMove( prev => ({ ...prev, secondTap: cell }));
     };
 
+    const changePawnType = (newPawnType) => {
+        setFigures(prev => 
+            prev.map(fig => (
+                {
+                    ...fig, 
+                    type: modalWindow.figId === fig.id ? newPawnType : fig.type
+                }
+            ))
+        )
+        setModalWindow({isOpened: false})
+    }
+
     return (
         <div className='row m-0 mw-100 p-2 px-4'>
-            {modalWindow && <Modal getFigureClasses={getFigureClasses} />}
+            {
+                modalWindow.isOpened && 
+                <Modal 
+                    getFigureClasses={getFigureClasses} 
+                    candidates={[pieces.KNIGHT, pieces.BISHOP, pieces.ROOK, pieces.QUEEN]} 
+                    changePawnType={changePawnType}
+                    color={playerSide}
+                />}
 
             <div className=' col-lg-3 col-sm-12 p-2'>
                 <div className='bg-brown opacity-75 p-3 text-light'>

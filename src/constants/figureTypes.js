@@ -29,6 +29,72 @@ const getBishopDotsToMove = func => [
     func(i => i + 1, i => -i - 1 ),
 ]
 
+const getKnightDotsToMove = (x, y) => [
+    {x: x + 1, y: y + 2},
+    {x: x + 1, y: y - 2},
+    {x: x - 1, y: y + 2},
+    {x: x - 1, y: y - 2},
+    {x: x + 2, y: y + 1},
+    {x: x + 2, y: y - 1},
+    {x: x - 2, y: y + 1},
+    {x: x - 2, y: y - 1},
+]
+
+const getKingDotsToMove =(x, y)=> [
+    {
+        action: moveActions.MOVE_FOR_KING,
+        data: [
+            {x: x + 1, y: y},
+            {x: x - 1, y: y},
+            {x: x, y: y + 1},
+            {x: x, y: y - 1},
+            {x: x + 1, y: y + 1},
+            {x: x + 1, y: y - 1},
+            {x: x - 1, y: y - 1},
+            {x: x - 1, y: y + 1},
+        ]
+    },
+    {
+        action: moveActions.SHORT_CASTLING,
+        data: {x: x + 2, y: y}
+    },
+    {
+        action: moveActions.LONG_CASTLING,
+        data: {x: x - 2, y: y}
+    }
+]
+
+const getPawnDotsToMove = (x, y, color) => [
+    {
+        action: moveActions.PAWN_MOVE,
+        data: {
+            x: x, 
+            y: y + (color === colors.BLACK ? -1 : 1)
+        }
+        
+    },
+    { 
+        action: moveActions.PAWN_MOVE_TWO_CELLS, 
+        data: {
+            x: x, 
+            y: y + (color === colors.BLACK ? -2 : 2)
+        }
+    },
+    {
+        action: moveActions.PAWN_KILL_RIGHT, 
+        data: {
+            x: x + 1, 
+            y: y + (color === colors.BLACK ? -1 : 1)
+        }
+    },
+    {
+        action: moveActions.PAWN_KILL_LEFT, 
+        data: {
+            x: x - 1, 
+            y: y + (color === colors.BLACK ? -1 : 1)
+        }
+    },
+]
 
 
 const limitDotsCountToMove = (action, arr) => {
@@ -37,9 +103,18 @@ const limitDotsCountToMove = (action, arr) => {
     if(action === moveActions.MOVE_FOR_KNIGHT)
         return arr.filter(el => filterConditions(el.x, el.y))
         
-    else if(action === moveActions.MULTI_ACTION)
+    else if(action === moveActions.PAWN_ACTIONS)
         return arr.filter(el => filterConditions(el.data.x, el.data.y))
-    
+
+    else if(action === moveActions.KING_ACTIONS) {
+        return arr.map(el =>(
+            el.action === moveActions.MOVE_FOR_KING && 
+            {action: moveActions.MOVE_FOR_KING, data: el.data.filter(e => filterConditions(e.x, e.y))} || 
+            el.action === moveActions.LONG_CASTLING && el ||
+            el.action === moveActions.SHORT_CASTLING && el)
+        )  
+    }
+
     else if(action === moveActions.COULD_BE_INTERRUPTED)
         return arr.map(el => el.filter(el => filterConditions(el.x, el.y)))
 
@@ -60,30 +135,7 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
             let dotsToMove = {
                 [pieces.KING]: {
                     action: moveActions.KING_ACTIONS,
-                    data: [
-                        {
-                            action: moveActions.MOVE_FOR_KING,
-                            data: [
-                                {x: x + 1, y: y},
-                                {x: x - 1, y: y},
-                                {x: x, y: y + 1},
-                                {x: x, y: y - 1},
-                                {x: x + 1, y: y + 1},
-                                {x: x + 1, y: y - 1},
-                                {x: x - 1, y: y - 1},
-                                {x: x - 1, y: y + 1},
-                            ]
-                        },
-                        {
-                            action: moveActions.SHORT_CASTLING,
-                            data: {x: x + 2, y: y}
-                        },
-                        {
-                            action: moveActions.LONG_CASTLING,
-                            data: {x: x - 2, y: y}
-                        }
-                    ]
-                    
+                    data: getKingDotsToMove(x, y) 
                 },
 
                 [pieces.BISHOP]: {
@@ -106,51 +158,12 @@ export const figureTypes = [pieces.KING, pieces.BISHOP, pieces.ROOK, pieces.QUEE
                 
                 [pieces.KNIGHT]: {
                     action: moveActions.MOVE_FOR_KNIGHT,
-                    data: [
-                        {x: x + 1, y: y + 2},
-                        {x: x + 1, y: y - 2},
-                        {x: x - 1, y: y + 2},
-                        {x: x - 1, y: y - 2},
-                        {x: x + 2, y: y + 1},
-                        {x: x + 2, y: y - 1},
-                        {x: x - 2, y: y + 1},
-                        {x: x - 2, y: y - 1},
-                    ]
+                    data: getKnightDotsToMove(x, y)
                 },
 
                 [pieces.PAWN]: {
                     action: moveActions.PAWN_ACTIONS,  
-                    data: [
-                        {
-                            action: moveActions.PAWN_MOVE,
-                            data: {
-                                x: x, 
-                                y: y + (color === colors.BLACK ? -1 : 1)
-                            }
-                            
-                        },
-                        { 
-                            action: moveActions.PAWN_MOVE_TWO_CELLS, 
-                            data: {
-                                x: x, 
-                                y: y + (color === colors.BLACK ? -2 : 2)
-                            }
-                        },
-                        {
-                            action: moveActions.PAWN_KILL_RIGHT, 
-                            data: {
-                                x: x + 1, 
-                                y: y + (color === colors.BLACK ? -1 : 1)
-                            }
-                        },
-                        {
-                            action: moveActions.PAWN_KILL_LEFT, 
-                            data: {
-                                x: x - 1, 
-                                y: y + (color === colors.BLACK ? -1 : 1)
-                            }
-                        },
-                    ]
+                    data: getPawnDotsToMove(x, y, color)
                 }
             }
            
