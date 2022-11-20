@@ -12,6 +12,7 @@ import { HistoryBoard } from '../HistoryBoard/HistoryBoard';
 import { PlayerTurn } from '../PlayerTurn/PlayerTurn';
 import { colors, figureTypes, pieces } from '../../constants/figureTypes';
 import { moveActions } from '../../constants/moveActions';
+import { Modal } from '../Modal/Modal';
 
 export function ChessGame() {
 
@@ -53,6 +54,7 @@ export function ChessGame() {
 
     }, []);
 
+    const [modalWindow, setModalWindow] = useState(false)
 
     useEffect(() => {
         if (move.secondTap) {
@@ -61,12 +63,19 @@ export function ChessGame() {
             setAvailableToMove([]);
             historyPush(move);
         
-            setRookPositionWhenCastling(move)  
+            setRookPositionWhenCastling(move)
+
+            const isPawn = getFigureById(move.firstTap.figure).type === pieces.PAWN
+            const isBoardEnd = move.secondTap.y === 7 || move.secondTap.y === 0
+            if ( isPawn && isBoardEnd) {
+                setModalWindow(true)
+                changePawnType(move) 
+            }
 
             setMove({});
     
             // TODO debug 
-            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
         } else if (move.firstTap) {
             // count where we can go
@@ -132,16 +141,27 @@ export function ChessGame() {
     }
 
     const setRookPositionWhenCastling = (move) => {
-        const king = getFigureById(move.firstTap.figure).type === pieces.KING
+        const isKing = getFigureById(move.firstTap.figure).type === pieces.KING
         const dotOfShortCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x + 2, move.firstTap.y)
         const dotOfLongCastling = getCell(move.secondTap.x, move.secondTap.y) === getCell(move.firstTap.x - 2, move.firstTap.y)
 
-        if (king && dotOfShortCastling)
+        if (isKing && dotOfShortCastling)
             setFigureInCell(getFigureIdFromCell(move.firstTap?.x + 3, move.firstTap?.y), move.firstTap.x + 1, move.firstTap.y)
-        else if (king && dotOfLongCastling)
+        else if (isKing && dotOfLongCastling)
             setFigureInCell(getFigureIdFromCell(move.firstTap?.x - 4, move.firstTap?.y), move.firstTap.x - 1, move.firstTap.y)
 
 
+    }
+
+    const changePawnType = (move) => {
+                setFigures(prev => 
+                    prev.map(fig => (
+                        {
+                            ...fig, 
+                            type: move.firstTap.figure === fig.id ? 'rook' : fig.type
+                        }
+                    ))
+                )
     }
 
     const whereFigureCouldGo = (figure, cell) => {
@@ -251,6 +271,7 @@ export function ChessGame() {
 
     return (
         <div className='row m-0 mw-100 p-2 px-4'>
+            {modalWindow && <Modal getFigureClasses={getFigureClasses} />}
 
             <div className=' col-lg-3 col-sm-12 p-2'>
                 <div className='bg-brown opacity-75 p-3 text-light'>
@@ -267,7 +288,7 @@ export function ChessGame() {
                     availableToMove={availableToMove}
                     setFigureMoves={setFigureMoves}
                     getFigureClasses={getFigureClasses}
-                />
+                />  
             </div>
 
             <div className='col-lg-3 col-sm-12 p-2'>

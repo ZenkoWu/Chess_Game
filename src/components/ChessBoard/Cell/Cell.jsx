@@ -41,6 +41,7 @@ export const Cell=(
         >
             { isIncludesCellIdToMove && figure && <img src={sword} width='50px' /> }
             <div className={`${getFigureClasses(cell?.figure, 'shadow')} fs-1 position-absolute `}/>
+
         </div>
     )
 }
