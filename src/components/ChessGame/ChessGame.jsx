@@ -56,10 +56,27 @@ export function ChessGame() {
 
     const [modalWindow, setModalWindow] = useState({isOpened: false})
 
+    const whiteKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.WHITE)?.id
+    const cellIdWithWhiteKing = cells.find(c => c.figure === whiteKingId)?.id
+    const blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK)?.id
+    const cellIdWithBlackKing = cells.find(c => c.figure === blackKingId)?.id 
+
+    const [isCheck, setCheck] = useState(false)
+    let ccc; 
     useEffect(() => {
         if (move.secondTap) {
-
+            let a;
             setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
+            a = whereFigureCouldGo(getFigureById(move.firstTap.figure), move.secondTap)
+            // console.log(a)
+            if( playerSide === 'white' && a.includes(cellIdWithBlackKing)) {
+                console.log('шах')
+                setCheck(true)
+            }else if (playerSide === 'black' && a.includes(cellIdWithWhiteKing))
+                console.log('шах')
+                setCheck(true)
+
+            
             setAvailableToMove([]);
             historyPush(move);
         
@@ -74,7 +91,7 @@ export function ChessGame() {
             setMove({});
     
             // TODO debug 
-            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
 
         } else if (move.firstTap) {
             // count where we can go
@@ -277,7 +294,7 @@ export function ChessGame() {
         )
         setModalWindow({isOpened: false})
     }
-
+    
     return (
         <div className='row m-0 mw-100 p-2 px-4'>
             {
@@ -304,6 +321,8 @@ export function ChessGame() {
                     availableToMove={availableToMove}
                     setFigureMoves={setFigureMoves}
                     getFigureClasses={getFigureClasses}
+                    cellIdWithBlackKing={cellIdWithBlackKing}
+                    isCheck={isCheck}
                 />  
             </div>
 
@@ -338,3 +357,12 @@ export function ChessGame() {
         </div>
     );
 }
+// let whiteKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.WHITE ).id
+// let cellWithWhiteKing = cells.find(c => c.figure === whiteKingId)
+// let blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK ).id
+// let cellwithBlackKing = cells.find(c => c.figure === blackKingId)
+// мы должны проверять какие две клетки содержат фигуру короля
+// затем мы должны проверять не содержат ли эту клетку в эвелблтумув какие нибудь вражеские фигуры 
+// если содержат, то шах нам и в свой ход мы можем ходить только королем чтобы уйти из под шаха, и король может уйти только если клетка в 
+// которую он собирается идти не находится в эвелблтумув чьей нибудь вражеской фигуры 
+// если королю некуда идти то объявляем мат 
