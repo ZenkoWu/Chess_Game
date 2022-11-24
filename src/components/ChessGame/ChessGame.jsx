@@ -25,8 +25,8 @@ export function ChessGame() {
             (pieces.KNIGHT + ' ').repeat(2) +
             (pieces.BISHOP + ' ').repeat(2) +
             (pieces.QUEEN + ' ') +
-            (pieces.KING + ' ') +
-            (pieces.PAWN + ' ').repeat(8)
+            (pieces.KING + ' ') 
+            // (pieces.PAWN + ' ').repeat(8)
         ).split(' ')[i % (maxBoardWidth * 2)],
         }))
     );
@@ -56,27 +56,47 @@ export function ChessGame() {
 
     const [modalWindow, setModalWindow] = useState({isOpened: false})
 
-    const whiteKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.WHITE)?.id
-    const cellIdWithWhiteKing = cells.find(c => c.figure === whiteKingId)?.id
-    const blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK)?.id
-    const cellIdWithBlackKing = cells.find(c => c.figure === blackKingId)?.id 
+    const [check, setCheck] = useState(false)
 
-    const [isCheck, setCheck] = useState(false)
-    let ccc; 
+    useEffect(() => {
+
+        const whiteKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.WHITE)?.id
+        const cellWithWhiteKing = cells.find(c => c.figure === whiteKingId)
+
+        const blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK)?.id
+        const cellWithBlackKing = cells.find(c => c.figure === blackKingId)
+
+        let arrOfEnemyFigureMoves = cells.map(c => {
+            let isEnemyFigureColor = getFigureById(c.figure)?.color !== playerSide
+            return whereFigureCouldGo( isEnemyFigureColor && getFigureById(c.figure), c)
+        }).filter(arr => arr.length > 0)
+
+        arrOfEnemyFigureMoves = [].concat(...arrOfEnemyFigureMoves);   
+        // console.log(arrOfEnemyFigureMoves)
+        
+        if (arrOfEnemyFigureMoves.includes(cellWithBlackKing?.id) ) {
+            console.log('шах')
+            // если шах то:
+            // либо король может уйти в безопасную точку - определить что это и как ее находить 
+            // либо закрыть фигурой - как проверять свои фигуры что они могут встать на пути короля
+            // либо убить нападающую фигуру 
+            // остальным фигурам ход ограничить - где это делать в веркудГо или в юзэффекте когда высчитываем ходы, либо при ферст тапе
+            // проверять не содержатся ли точки для хода короля в фигуреэнеми 
+            // если в эвейлблТуМув после ферст тапа 0 то мат
+            setCheck({cellId: cellWithBlackKing.id})
+        } 
+        else if (arrOfEnemyFigureMoves.includes(cellWithWhiteKing?.id)) {
+            console.log('шах')
+            setCheck({cellId: cellWithWhiteKing.id})
+        }
+        
+            
+    }, [playerSide])
+
     useEffect(() => {
         if (move.secondTap) {
-            let a;
+           
             setFigureInCell(move.firstTap.figure, move.secondTap.x, move.secondTap.y);
-            a = whereFigureCouldGo(getFigureById(move.firstTap.figure), move.secondTap)
-            // console.log(a)
-            if( playerSide === 'white' && a.includes(cellIdWithBlackKing)) {
-                console.log('шах')
-                setCheck(true)
-            }else if (playerSide === 'black' && a.includes(cellIdWithWhiteKing))
-                console.log('шах')
-                setCheck(true)
-
-            
             setAvailableToMove([]);
             historyPush(move);
         
@@ -88,14 +108,60 @@ export function ChessGame() {
                 setModalWindow({isOpened: true, figId: move.firstTap.figure})
             }
 
-            setMove({});
-    
+            setMove({});  
             // TODO debug 
             setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
-
+            setCheck(false)
+            
         } else if (move.firstTap) {
             // count where we can go
-            setAvailableToMove(whereFigureCouldGo(getFigureById(move.firstTap.figure), move.firstTap));
+            let f = getFigureById(move.firstTap.figure)
+            
+            let a = whereFigureCouldGo(f, move.firstTap)
+            let a3 = [] //enemy arr
+            let a4 = [] // my fig arr
+            const blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK)?.id
+        const cellWithBlackKing = cells.find(c => c.figure === blackKingId)
+            let king  = whereFigureCouldGo(getFigureById(blackKingId), cellWithBlackKing)
+            
+             cells.forEach(c=> {
+               if (getFigureById(c.figure)?.color !== playerSide) {
+                    whereFigureCouldGo(getFigureById(c.figure), c).forEach(el => a3.push(el))
+               }
+            }
+            )
+
+            cells.forEach(c=> {
+                if (getFigureById(c.figure)?.color == playerSide) {
+                     whereFigureCouldGo(getFigureById(c.figure), c).forEach(el => a4.push(el))
+                }
+             }
+             )
+
+            // console.log(a3)
+            // console.log(a)
+            if (f.type === 'king') {
+            a3.forEach(el => {
+                   a = a.filter(el2 => el != el2)
+            })
+            console.log(a)
+            if(a.length<1)
+                console.log('checkmate')
+            setAvailableToMove(a);
+        } else if(!check) {
+            setAvailableToMove(a);
+        } else if(check) {
+            // фигура может ходить только если может защитить короля или убить фигуру, нужно проверить массив своих фигур если их точки
+            // есть в массиве а2 то фигура может ходить, если нет то не может
+            // a3.forEach(el => {
+                let getA = whereFigureCouldGo(getFigureById(history[history.length-1].firstTap.figure), history[history.length-1].secondTap)
+                console.log(getA)
+                
+                a = a.filter(el2 => history[history.length-1].secondTap.id == el2 || getA.includes(el2) && king.includes(el2) ) //убить фигуру или
+                //  те же точки  что и у нападающей и те же точки что у короля  
+        //  })
+         setAvailableToMove(a);
+        }
         }
     }, [move]);
 
@@ -176,18 +242,30 @@ export function ChessGame() {
 
     const whereFigureCouldGo = (figure, cell) => {
         let dots = [] 
-        
-        let figureDots = figureTypes.find(f => f.value === figure.type)?.getDotsToMove(cell, figure.color)
-    
+        let figureDots = figureTypes.find(f => f.value === figure?.type)?.getDotsToMove(cell, figure.color)
+        let enemyFigureColor = figure?.color === colors.WHITE ? colors.BLACK  : colors.WHITE 
+
         const pushCellsIdWhereFigureCanGo = (x, y, array) => {
             const figure = getFigureById(getFigureIdFromCell(x, y))
 
-            if (figure) {
-                if (figure.color !== playerSide) {
+            if (figure && !check) {
+                
+                if (figure.color === enemyFigureColor) {
                     array.push(getCellId(x, y));
+                
+                    
                 }
                 return true;
+            
             }
+            if(figure && check) {
+                if (figure.color === enemyFigureColor) {
+                    array.push(getCellId(x, y));
+                }if (figure.color !== enemyFigureColor) {
+                    return true;
+                }
+            }
+        
             array.push(getCellId(x, y));
             return false;
         }
@@ -198,7 +276,6 @@ export function ChessGame() {
                     if ( pushCellsIdWhereFigureCanGo(p.x, p.y, dots)) 
                         break;
                 }
-
             } 
             
             else if (figureDots.action === moveActions.MOVE_FOR_KNIGHT) 
@@ -271,14 +348,33 @@ export function ChessGame() {
                 
         })
 
-        return dots;
-    };
+        
+        // if(!check) {
+            return dots;
+        //  } else if (check) {
+
+        //     let arrOfEnemyFigureMoves = [] 
+        //     cells.forEach(c => {
+        //         let isEnemyFigureColor = getFigureById(c.figure)?.color !== 'black'
+        //         if(isEnemyFigureColor) {
+        //             pushCellsIdWhereFigureCanGo(c.x, c.y, arrOfEnemyFigureMoves)
+        //         }
+                
+        //     })
+        //     console.log(arrOfEnemyFigureMoves)
+           
+        //     let d = dots.filter(d => !arrOfEnemyFigureMoves?.includes(d))
+        //     console.log(d)
+        //     return d;
+            
+        // }
+    }; 
     
     const setFigureMoves = (cell) => {
         const figure = getFigureById(cell.figure);
 
         if (figure?.color === playerSide) 
-            setMove( prev => ({ ...prev, firstTap: cell }));
+            setMove( prev => ({ ...prev, firstTap: cell }));  
         else if (availableToMove.includes(cell.id)) 
             setMove( prev => ({ ...prev, secondTap: cell }));
     };
@@ -306,7 +402,7 @@ export function ChessGame() {
                     color={playerSide}
                 />}
 
-            <div className=' col-lg-3 col-sm-12 p-2'>
+            <div className='col-lg-3 col-sm-12 p-2'>
                 <div className='bg-brown opacity-75 p-3 text-light'>
                     <div>{'Матч'}</div>
                     <div>{matchNumber}</div>
@@ -321,8 +417,7 @@ export function ChessGame() {
                     availableToMove={availableToMove}
                     setFigureMoves={setFigureMoves}
                     getFigureClasses={getFigureClasses}
-                    cellIdWithBlackKing={cellIdWithBlackKing}
-                    isCheck={isCheck}
+                    check={check}
                 />  
             </div>
 
@@ -366,3 +461,4 @@ export function ChessGame() {
 // если содержат, то шах нам и в свой ход мы можем ходить только королем чтобы уйти из под шаха, и король может уйти только если клетка в 
 // которую он собирается идти не находится в эвелблтумув чьей нибудь вражеской фигуры 
 // если королю некуда идти то объявляем мат 
+// isCheck в иссторию и мув 

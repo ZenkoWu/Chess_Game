@@ -34,8 +34,7 @@ export default function ChessBoard(
         availableToMove, 
         getFigureClasses, 
         setFigureMoves,
-        cellIdWithBlackKing,
-        isCheck
+        check
     }) {
 
     return (
@@ -58,8 +57,7 @@ export default function ChessBoard(
                                 setFigureMoves={setFigureMoves}
                                 getFigureClasses={getFigureClasses}
                                 isCellFirstTap={isCellFirstTap}
-                                cellIdWithBlackKing={cellIdWithBlackKing}
-                                isCheck={isCheck}
+                                check={check}
                             />
                         ))}
                     </div>
