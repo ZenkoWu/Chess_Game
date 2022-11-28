@@ -42,10 +42,7 @@ export const Cell=(
             onClick={() => setFigureMoves(cell)}
         >
             { isIncludesCellIdToMove && figure && <img src={sword} width='50px' /> }
-            <div className={`${getFigureClasses(cell?.figure, 'shadow')} fs-1 position-absolute `}>
-                {/* <div className='fs-6'>{figure} {id}</div> */}
-            </div>
-
+            <div className={`${getFigureClasses(cell?.figure, 'shadow')} fs-1 position-absolute`}/>
         </div>
     )
 }

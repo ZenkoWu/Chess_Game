@@ -4,7 +4,7 @@ import './ChessBoard.css'
 
 const LettersAxis=()=> {
     return (
-        <div className='row m-0 mw-100 px-4'>
+        <div className='row m-0 mw-100 px-4 text-dark'>
             {lettersAxis.map((item, i) => (
                 <div key={i} className='col fw-bold'>
                 {item}
@@ -16,7 +16,7 @@ const LettersAxis=()=> {
 
 const NumbersAxis=()=> {
     return (
-        <div className={`col p-0 `}>
+        <div className='col p-0 text-dark'>
             {numbersAxis.map((item, i) => (
                 <div key={i} className=' fw-bold' style={{padding:'20px 0'}}>
                 {item}

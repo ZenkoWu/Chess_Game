@@ -5,7 +5,8 @@ export const OneMoveHistory=(
         secondTap, 
         figureColor, 
         getFigureClasses, 
-        moveNumber
+        moveNumber,
+        castling
     }) => {
     
     return (
@@ -14,13 +15,13 @@ export const OneMoveHistory=(
             <div className='col-2 px-2'>{moveNumber}</div>
 
             <div className={`col-5 text-${figureColor} `}>
-                <span className={getFigureClasses(firstTap?.figure) + ' px-1'}/>
-                {firstTap.id}
+                <span className={getFigureClasses(firstTap?.figure) + ' px-2'}/>
+                {firstTap?.id}
             </div>
 
             <div className={`col-5 text-${figureColor} text-end pe-5`}>
-                { secondTap?.figure && <i className={getFigureClasses(secondTap?.figure) + ' px-1'}/> }
-                {secondTap.id}
+                {secondTap?.figure && <i className={getFigureClasses(secondTap?.figure) + ' px-1'}/> }
+                {castling ? castling : secondTap?.id}
             </div>
 
         </div>

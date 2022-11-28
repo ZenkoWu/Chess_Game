@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* color: white; */
 }
 
 .App {
@@ -9,12 +10,14 @@
   background-color: rgb(226, 197, 169);
   width: 100%;
   height: 100%;
+  /* color: white; */
 }
 
 /* #523d2b */
 
 .content {
   width: 100%;
+  color: white;
 }
 
 .playerTurn {

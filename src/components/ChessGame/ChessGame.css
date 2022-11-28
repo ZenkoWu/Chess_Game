@@ -21,3 +21,9 @@
 .cursor {
   cursor: pointer;
 }
+
+.animated {
+  transition: all 0.4s ease;
+ 
+}
+

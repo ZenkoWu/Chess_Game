@@ -1,7 +1,7 @@
 import './Modal.css'
 
 export const Modal = ({getFigureClasses, candidates, changePawnType, color}) => {
-    const PotentialPwnTypes = ({type, color}) => {
+    const PotentialPawnTypes = ({type, color}) => {
         return (
             <div className={' col-3 fs-100'}>
                 <i 
@@ -17,7 +17,7 @@ export const Modal = ({getFigureClasses, candidates, changePawnType, color}) => 
             <div className=" py-4">
                 <div className="row mw-100 m-0">
                     {candidates.map(candidate => 
-                        <PotentialPwnTypes type={candidate} key={candidate} color={color}/>
+                        <PotentialPawnTypes type={candidate} key={candidate} color={color}/>
                     )}
                 </div>
             </div>
