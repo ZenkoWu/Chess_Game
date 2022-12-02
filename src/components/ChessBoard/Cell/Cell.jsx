@@ -9,6 +9,7 @@ export const Cell=(
         setFigureMoves,
         getFigureClasses,
         check,
+        isCheckmate
     }) => {
 
     const getDefaultCellColor = (x, y) => 
@@ -26,8 +27,8 @@ export const Cell=(
                 getDefaultCellColor(x, y) +
                 ' opacity-75 d-flex justify-content-center align-items-center ' +
                 (check.cellId === id ? ' bg-red ' : '') +
-                canActivateCell(figure, id) +
-                (isCellFirstTap(id) ? ' activeCell ' : '') +
+                (!isCheckmate && canActivateCell(figure, id) ) +
+                (!isCheckmate && isCellFirstTap(id) ? ' activeCell ' : '') +
                 (
                     isIncludesCellIdToMove && figure ? 
                     ' bg-green cursor' 

@@ -12,7 +12,8 @@ import { HistoryBoard } from '../HistoryBoard/HistoryBoard';
 import { PlayerTurn } from '../PlayerTurn/PlayerTurn';
 import { colors, figureTypes, pieces } from '../../constants/figureTypes';
 import { moveActions } from '../../constants/moveActions';
-import { Modal } from '../Modal/Modal';
+import { ChangePawnTypeModal } from '../Modal/ChangePawnTypeModal';
+import { CheckmateModal } from '../Modal/CheckmateModal';
 
 export function ChessGame() {
 
@@ -22,7 +23,7 @@ export function ChessGame() {
         color: i < 16 ? colors.BLACK : colors.WHITE,
         type: (
             (pieces.ROOK + ' ').repeat(2) +
-            // (pieces.KNIGHT + ' ').repeat(2) +
+            (pieces.KNIGHT + ' ').repeat(2) +
             (pieces.BISHOP + ' ').repeat(2) +
             (pieces.QUEEN + ' ') +
             (pieces.KING + ' ') +
@@ -57,11 +58,34 @@ export function ChessGame() {
     const [modalWindow, setModalWindow] = useState({isOpened: false})
 
     const [check, setCheck] = useState({isCheck: false})
-    const [checkmate, setCheckmate] = useState(false)
+    const [isCheckmate, setCheckmate] = useState(true)
 
 
     const whiteKingId = figures.find(fig => fig.type === pieces.KING && fig.color === colors.WHITE)?.id
     const blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK)?.id
+
+    useEffect(()=> {
+
+        let dotsForPlayerSideFiguresMove = []
+        if(check.isCheck) {
+            cells.forEach(c => {
+                if(getFigureById(c.figure)?.color === playerSide) {
+                    let dotsToMove = whereFigureCouldGo(getFigureById(c.figure), c)
+                    if(getFigureById(c.figure).type !== 'king') {
+                        dotsForPlayerSideFiguresMove.push(...canProtectKingWhenCheck(dotsToMove)) 
+                    }
+                    else {
+                        dotsForPlayerSideFiguresMove.push(...canKingMove(dotsToMove))
+                    }
+                }
+            })
+
+            if (dotsForPlayerSideFiguresMove.length < 1) {
+                setCheckmate(true)
+            }
+        }
+            // console.log(dotsForPlayerSideFiguresMove)
+    }, [cells, check])
 
     useEffect(() => {
 
@@ -81,8 +105,7 @@ export function ChessGame() {
         else if (arrOfEnemyFigureMoves.includes(cellWithWhiteKing?.id)) {
             setCheck({isCheck: true, cellId: cellWithWhiteKing.id})
         }
-        
-            
+
     }, [playerSide])
 
     useEffect(() => {
@@ -105,77 +128,85 @@ export function ChessGame() {
 
             setMove({});  
             // TODO debug 
-            setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
+            // setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
             setCheck({isCheck: false})
             
         } else if (move.firstTap) {
 
             let figure = getFigureById(move.firstTap.figure)
-            
             let dotsForFigureMove = whereFigureCouldGo(figure, move.firstTap)
-            let dotsForEnemyMoves = [] 
-            
-            cells.forEach(c => {
-                if (getFigureById(c.figure)?.color !== playerSide) {
-                    whereFigureCouldGo(getFigureById(c.figure), c).forEach(el => dotsForEnemyMoves.push(el))
-                }
-            })
 
-            if (figure.type === pieces.KING) { // король независимо от ситуации не ходит под удар
-                dotsForFigureMove = dotsForFigureMove.filter(el => !dotsForEnemyMoves.includes(el))
-                // рокировки быть не может если король проходит битое поле
-                if (!history.find(el => el.castling && el.figureColor === colors.WHITE || el.firstTap.figure === whiteKingId)) { 
-                    dotsForFigureMove = dotsForFigureMove
-                        .filter(el => dotsForEnemyMoves.includes('D1') ? el !== 'C1': el)
-                        .filter(el => dotsForEnemyMoves.includes('F1') ? el !== 'G1': el)
-                }
-                else if (!history.find(el => el.castling && el.figureColor === colors.BLACK || el.firstTap.figure === blackKingId)) {
-                    dotsForFigureMove = dotsForFigureMove
-                        .filter(el => dotsForEnemyMoves.includes('F8') ? el !== 'G8': el)
-                        .filter(el => dotsForEnemyMoves.includes('D8') ? el !== 'C8': el)
-                }
-                setAvailableToMove(dotsForFigureMove);
-
-                if(dotsForFigureMove.length < 1)
-                    console.log('checkmate')
+            if (figure.type === pieces.KING) { 
+                // король независимо от ситуации не ходит под удар
+                setAvailableToMove(canKingMove(dotsForFigureMove));
             } 
             else if(!check.isCheck) { 
                 setAvailableToMove(dotsForFigureMove);
             } 
-            else if(check.isCheck) { // если шах и фигура != король
+            else if(check.isCheck) { 
+                // если шах и фигура != король
                 // фигура может ходить только если может защитить короля или убить фигуру
-                let attackingPiece = history.at(-1)
-                let dotsWhereAttackingPieceCanGo = whereFigureCouldGo(getFigureById(attackingPiece.firstTap.figure), attackingPiece.secondTap)
-                
-                let getCellById = (id) => cells.find(el => el.id === id)
-
-                const cellWithBlackKing = cells.find(c => c.figure === blackKingId)
-                const cellWithWhiteKing = cells.find(c => c.figure === whiteKingId)
-
-                let cellsBetweenKingAndAttaking = dotsWhereAttackingPieceCanGo.filter(el => {
-                    let xOfAttackingFigure = attackingPiece.secondTap.x
-                    let yOfAttackingFigure = attackingPiece.secondTap.y
-                    let xOfKing = playerSide === 'black' ? cellWithBlackKing.x : cellWithWhiteKing.x
-                    let yOfKing = playerSide === 'black' ? cellWithBlackKing.y : cellWithWhiteKing.y
-
-                    let cell = getCellById(el)
-                    return (
-                        cell.x <= xOfAttackingFigure && cell.x >= xOfKing && cell.y >= yOfAttackingFigure && cell.y <= yOfKing ||
-                        cell.x >= xOfAttackingFigure && cell.x <= xOfKing && cell.y <= yOfAttackingFigure && cell.y >= yOfKing ||
-                        cell.x <= xOfAttackingFigure && cell.x >= xOfKing && cell.y <= yOfAttackingFigure && cell.y >= yOfKing ||
-                        cell.x >= xOfAttackingFigure && cell.x <= xOfKing && cell.y >= yOfAttackingFigure && cell.y <= yOfKing
-                    )
-                }) 
-                
-                dotsForFigureMove = dotsForFigureMove.filter(el => 
-                    cellsBetweenKingAndAttaking.includes(el) || //находится между королем и атакующей = может защитить короля
-                    attackingPiece.secondTap.id == el // может убить фигуру 
-                ) 
-
-                setAvailableToMove(dotsForFigureMove);
+                setAvailableToMove(canProtectKingWhenCheck(dotsForFigureMove));
             }
         }
     }, [move]);
+
+    let canKingMove = (dotsForFigureMove) => {
+        let dotsForEnemyMoves = [] 
+           
+        cells.forEach(c => {
+            if (getFigureById(c.figure)?.color !== playerSide) {
+                whereFigureCouldGo(getFigureById(c.figure), c).forEach(el => dotsForEnemyMoves.push(el))
+            }
+        })
+        dotsForFigureMove = dotsForFigureMove.filter(el => !dotsForEnemyMoves.includes(el))
+        // рокировки быть не может если король проходит битое поле
+        if (!history.find(el => el.castling && el.figureColor === colors.WHITE || el.firstTap.figure === whiteKingId)) { 
+            dotsForFigureMove = dotsForFigureMove
+                .filter(el => dotsForEnemyMoves.includes('D1') ? el !== 'C1': el)
+                .filter(el => dotsForEnemyMoves.includes('F1') ? el !== 'G1': el)
+        }
+        else if (!history.find(el => el.castling && el.figureColor === colors.BLACK || el.firstTap.figure === blackKingId)) {
+            dotsForFigureMove = dotsForFigureMove
+                .filter(el => dotsForEnemyMoves.includes('F8') ? el !== 'G8': el)
+                .filter(el => dotsForEnemyMoves.includes('D8') ? el !== 'C8': el)
+        }
+
+        return dotsForFigureMove;
+    }
+
+    let canProtectKingWhenCheck = (dotsForFigureMove) => {
+        let attackingPiece = history.at(-1)
+        let dotsWhereAttackingPieceCanGo = whereFigureCouldGo(getFigureById(attackingPiece.firstTap.figure), attackingPiece.secondTap)
+        console.log(dotsWhereAttackingPieceCanGo)
+        
+        let getCellById = (id) => cells.find(el => el.id === id)
+
+        const cellWithBlackKing = cells.find(c => c.figure === blackKingId)
+        const cellWithWhiteKing = cells.find(c => c.figure === whiteKingId)
+
+        let cellsBetweenKingAndAttaking = dotsWhereAttackingPieceCanGo.filter(el => {
+            let xOfAttackingFigure = attackingPiece.secondTap.x
+            let yOfAttackingFigure = attackingPiece.secondTap.y
+            let xOfKing = playerSide === 'black' ? cellWithBlackKing.x : cellWithWhiteKing.x
+            let yOfKing = playerSide === 'black' ? cellWithBlackKing.y : cellWithWhiteKing.y
+
+            let cell = getCellById(el)
+            return (
+                cell.x <= xOfAttackingFigure && cell.x >= xOfKing && cell.y > yOfAttackingFigure && cell.y < yOfKing ||
+                cell.x > xOfAttackingFigure && cell.x <= xOfKing && cell.y < yOfAttackingFigure && cell.y > yOfKing ||
+                cell.x === xOfAttackingFigure && cell.x === xOfKing && cell.y < yOfAttackingFigure && cell.y > yOfKing || //конь
+                cell.x < xOfAttackingFigure && cell.x > xOfKing && cell.y < yOfAttackingFigure && cell.y > yOfKing ||
+                cell.x > xOfAttackingFigure && cell.x < xOfKing && cell.y > yOfAttackingFigure && cell.y < yOfKing
+            )
+        }) 
+        
+        return dotsForFigureMove = dotsForFigureMove.filter(el => 
+            cellsBetweenKingAndAttaking.includes(el) || //находится между королем и атакующей = может защитить короля
+            attackingPiece.secondTap.id == el // может убить фигуру 
+        ) 
+
+    }
 
     function setDefaultFigurePosition(arr) {
         let arrayOfFoundElementsId = [];
@@ -229,7 +260,7 @@ export function ChessGame() {
             );
         }
 
-        return null;
+        return false;
     };
 
     const getCell = (x, y) => cells.find(cell => cell.y === y && cell.x === x)
@@ -275,7 +306,9 @@ export function ChessGame() {
                 }
                 else if (check.isCheck) {
                     if(figure.color == playerSide && otherFigure.color == playerSide) 
-                        return true;      
+                        return true;    
+                    // if(otherFigure.color == playerSide) 
+                    //     return true;  
                     else if (otherFigure.color !== playerSide) {
                         array.push(getCellId(x, y));
                         return true; 
@@ -339,8 +372,12 @@ export function ChessGame() {
                 const isCellContainsFigure = (x, y) => getCell(x, y)?.figure
 
                 const isActionPawnMove = el.action === moveActions.PAWN_MOVE
-                if (isActionPawnMove && !isCellContainsFigure(x, y)) 
-                    pushCellsIdWhereFigureCanGo(x, y, dots)
+                if (isActionPawnMove && !isCellContainsFigure(x, y)) {
+                    if(check.isCheck && figure.color === playerSide)
+                        pushCellsIdWhereFigureCanGo(x, y, dots)
+                    else if (!check.isCheck)
+                        pushCellsIdWhereFigureCanGo(x, y, dots)
+                }
 
                 const isPawnInitialPosition = (cell.y === 6 || cell.y === 1)
                 const isActionPawnMoveTwo = el.action === moveActions.PAWN_MOVE_TWO_CELLS
@@ -354,10 +391,17 @@ export function ChessGame() {
                     pushCellsIdWhereFigureCanGo(x, y, dots)
 
                 const isEnemyFigureColor = getFigureByXY(x, y)?.color === (figure.color === colors.BLACK ? colors.WHITE : colors.BLACK)
-                if(isEnemyFigureColor){
-                    const isActionPawnKillLeft = el.action === moveActions.PAWN_KILL_LEFT 
-                    const isActionPawnKillRight = el.action === moveActions.PAWN_KILL_RIGHT
+                const isActionPawnKillLeft = el.action === moveActions.PAWN_KILL_LEFT 
+                const isActionPawnKillRight = el.action === moveActions.PAWN_KILL_RIGHT
 
+                if(isEnemyFigureColor){
+                    if (isActionPawnKillLeft)      
+                        pushCellsIdWhereFigureCanGo(x, y, dots)        
+                
+                    if (isActionPawnKillRight) 
+                        pushCellsIdWhereFigureCanGo(x, y, dots)
+                } 
+                else if (check.isCheck && figure.color !== playerSide){
                     if (isActionPawnKillLeft)      
                         pushCellsIdWhereFigureCanGo(x, y, dots)        
                 
@@ -392,13 +436,17 @@ export function ChessGame() {
     return (
         <div className='row m-0 mw-100 p-2 px-4'>
             {
+                isCheckmate && <CheckmateModal playerSide={playerSide} />
+            }
+            {
                 modalWindow.isOpened && 
-                <Modal 
+                <ChangePawnTypeModal 
                     getFigureClasses={getFigureClasses} 
                     candidates={[pieces.KNIGHT, pieces.BISHOP, pieces.ROOK, pieces.QUEEN]} 
                     changePawnType={changePawnType}
                     color={modalWindow.color}
-                />}
+                />
+            }
 
             <div className='col-lg-3 col-sm-12 p-2'>
                 <div className='bg-brown opacity-75 p-3 text-light'>
@@ -408,7 +456,7 @@ export function ChessGame() {
                 {
                     <div className='py-2'> 
                         <div className={'p-4  opacity-0 animated '  + (check.isCheck && ' opacity-100 animated bg-red text-white')}>
-                            <span>{checkmate ? 'Шах и мат!' : 'Шах!'}</span>
+                            <span>{isCheckmate ? 'Шах и мат!' : 'Шах!'}</span>
                         </div>
                     </div> 
                 }
@@ -423,6 +471,7 @@ export function ChessGame() {
                     setFigureMoves={setFigureMoves}
                     getFigureClasses={getFigureClasses}
                     check={check}
+                    isCheckmate={isCheckmate}
                 />  
             </div>
 
@@ -433,6 +482,7 @@ export function ChessGame() {
                     getFigureClasses={getFigureClasses} 
                     isPlayerTurn={playerSide === colors.BLACK}  
                     side={colors.BLACK} 
+                    isCheckmate={isCheckmate}
                 />
             
                 <HistoryBoard history={history} getFigureClasses={getFigureClasses}/>
@@ -451,6 +501,7 @@ export function ChessGame() {
                     getFigureClasses={getFigureClasses} 
                     isPlayerTurn={playerSide === colors.WHITE} 
                     side={colors.WHITE}
+                    isCheckmate={isCheckmate}
                 />
 
             </div>

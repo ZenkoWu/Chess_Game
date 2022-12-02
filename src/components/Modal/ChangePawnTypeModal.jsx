@@ -1,6 +1,6 @@
-import './Modal.css'
+import './ChangePawnTypeModal.css'
 
-export const Modal = ({getFigureClasses, candidates, changePawnType, color}) => {
+export const ChangePawnTypeModal = ({getFigureClasses, candidates, changePawnType, color}) => {
     const PotentialPawnTypes = ({type, color}) => {
         return (
             <div className={' col-3 fs-100'}>
