@@ -1,40 +1,81 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react'
 
-const Timer = (props) => {
-    const {initialMinute = 0, initialSeconds = 0} = props;
-    const [ minutes, setMinutes ] = useState(initialMinute);
-    const [seconds, setSeconds ] =  useState(initialSeconds);
+const STATUS = {
+  STARTED: 'Started',
+  STOPPED: 'Stopped',
+}
 
-    let myInterval = () => setTimeout(() => {
-        if (seconds > 0) {
-            setSeconds(seconds - 1);
-        }
-        if (seconds === 0) {
-            if (minutes === 0) {
-                clearInterval(myInterval)
-            } else {
-                setMinutes(minutes - 1);
-                setSeconds(59);
-            }
-        } 
-    }, 1000)
+const INITIAL_COUNT = 1800
 
-    props.isCountdown && myInterval()
+function useInterval(callback, delay) {
+    const savedCallback = useRef()
+  
+    // Remember the latest callback.
+    useEffect(() => {
+      savedCallback.current = callback
+    }, [callback])
+  
+    // Set up the interval.
+    useEffect(() => {
+      function tick() {
+        savedCallback.current()
+      }
+      if (delay !== null) {
+        let id = setInterval(tick, delay)
+        return () => clearInterval(id)
+      }
+    }, [delay])
+}
+  
+const twoDigits = (num) => String(num).padStart(2, '0')
 
-    return (
+function Timer(props) {
+  const [secondsRemaining, setSecondsRemaining] = useState(INITIAL_COUNT)
+  const [status, setStatus] = useState(STATUS.STOPPED)
+
+  const secondsToDisplay = secondsRemaining % 60
+  const minutesRemaining = (secondsRemaining - secondsToDisplay) / 60
+  const minutesToDisplay = minutesRemaining % 60
+
+  const handleStart = () => {
+    setStatus(STATUS.STARTED)
+  }
+  const handleStop = () => {
+    setStatus(STATUS.STOPPED)
+  }
+  const handleReset = () => {
+    setStatus(STATUS.STOPPED)
+    setSecondsRemaining(INITIAL_COUNT)
+  }
+
+  useInterval(
+    () => {
+      if (secondsRemaining > 0) {
+        setSecondsRemaining(secondsRemaining - 1)
+      } else {
+        setStatus(STATUS.STOPPED)
+      }
+    },
+    status === STATUS.STARTED ? 1000 : null,
+    // passing null stops the interval
+  )
+
+  useEffect(()=>{
+    props.isCountdown && handleStart()
+    !props.isCountdown && handleStop()
+
+  }, [ props.isCountdown])
+
+  return (
+    <div >
+        {/* <button onClick={handleReset} type="button">
+            Reset
+        </button>  */}
         <div>
-            { 
-                minutes === 0 && seconds === 0 ? 
-                    <span> 00:00 </span> 
-                :
-                minutes === 0 && seconds <= 59 ?
-                    <span className='text-danger'> {minutes}:{seconds < 10 ?  `0${seconds}` : seconds}</span> 
-                : 
-                    <span> {minutes}:{seconds < 10 ?  `0${seconds}` : seconds}</span> 
-            }
+            {twoDigits(minutesToDisplay)}:{twoDigits(secondsToDisplay)}
         </div>
-    )
+    </div>
+  )
 }
 
 export default Timer;

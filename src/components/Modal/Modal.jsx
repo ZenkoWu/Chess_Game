@@ -6,7 +6,7 @@ export const Modal = ({getFigureClasses, candidates, changePawnType, color}) => 
             <div className={' col-3 fs-100'}>
                 <i 
                     className={getFigureClasses(false, 'shadow', type, color) + ' cursor'} 
-                    onClick={() => changePawnType(type)}
+                    onClick={() => changePawnType(type, color)}
                 />
             </div>
         )
