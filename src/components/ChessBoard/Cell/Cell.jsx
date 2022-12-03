@@ -28,7 +28,7 @@ export const Cell=(
                 ' opacity-75 d-flex justify-content-center align-items-center ' +
                 (check.cellId === id ? ' bg-red ' : '') +
                 (!isCheckmate && canActivateCell(figure, id) ) +
-                (!isCheckmate && isCellFirstTap(id) ? ' activeCell ' : '') +
+                (isCellFirstTap(id) ? ' activeCell ' : '') +
                 (
                     isIncludesCellIdToMove && figure ? 
                     ' bg-green cursor' 
@@ -40,7 +40,7 @@ export const Cell=(
                 )
             }
             style={{width: '4.1rem', height: '4.1rem'}}
-            onClick={() => setFigureMoves(cell)}
+            onClick={() => !isCheckmate && setFigureMoves(cell)}
         >
             { isIncludesCellIdToMove && figure && <img src={sword} width='50px' /> }
             <div className={`${getFigureClasses(cell?.figure, 'shadow')} fs-1 position-absolute`}/>

@@ -1,7 +1,7 @@
 import { colors } from "../../constants/figureTypes"
 import Timer from "../Timer/Timer"
 
-export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side, isCheckmate}) => {
+export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side, isCheckmate, resetTimer}) => {
     const placeholder = '--:--'
     const killedFigures = history.filter(el => el.secondTap?.figure && el.figureColor === side)
      
@@ -15,7 +15,11 @@ export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side, isChe
             <div className='row m-0 mw-100 py-1 px-2'>
                 <div className='col-lg-10 text-start ps-1'>{side + ' side'}</div>
                 <div className='col-lg-2 p-0 fw-bold'>
-                    <Timer isCountdown={isPlayerTurn} isCheckmate={isCheckmate}/>
+                    <Timer 
+                        isCountdown={isPlayerTurn} 
+                        isCheckmate={isCheckmate} 
+                        resetTimer={resetTimer}
+                    />
                 </div>
             </div> 
 

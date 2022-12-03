@@ -64,8 +64,9 @@ function Timer(props) {
 
         (props.isCheckmate || !props.isCountdown) && handleStop()
         !props.isCheckmate && props.isCountdown && handleStart()
+        props.resetTimer && handleReset()
 
-  }, [props.isCountdown, props.isCheckmate])
+  }, [props.isCountdown, props.isCheckmate, props.resetTimer])
 
   return (
     <div >
