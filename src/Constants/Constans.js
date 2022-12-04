@@ -20,3 +20,16 @@ export const arrDefaultFigurePosition = [
     { start: 0, xOffsetBetweenFigures: 7, type: pieces.ROOK, color: colors.WHITE, y: 0 },
 ];
 
+export const figuresInitialState = Array.from({ length: 32 }, (_, i) => ({
+    id: i + 1,
+    color: i < 16 ? colors.BLACK : colors.WHITE,
+    type: (
+        (pieces.ROOK + ' ').repeat(2) +
+        (pieces.KNIGHT + ' ').repeat(2) +
+        (pieces.BISHOP + ' ').repeat(2) +
+        (pieces.QUEEN + ' ') +
+        (pieces.KING + ' ') +
+        (pieces.PAWN + ' ').repeat(8)
+    ).split(' ')[i % (maxBoardWidth * 2)],
+    })
+)

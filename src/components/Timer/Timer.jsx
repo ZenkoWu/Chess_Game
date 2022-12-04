@@ -62,14 +62,14 @@ function Timer(props) {
 
   useEffect(() => {
 
-        (props.isCheckmate || !props.isCountdown) && handleStop()
-        !props.isCheckmate && props.isCountdown && handleStart()
+        (props.isCheckmate || !props.isCountdown || props.isDraw) && handleStop()
+        !props.isCheckmate && !props.isDraw && props.isCountdown && handleStart()
         props.resetTimer && handleReset()
 
-  }, [props.isCountdown, props.isCheckmate, props.resetTimer])
+  }, [props.isCountdown, props.isCheckmate, props.resetTimer, props.isDraw])
 
   return (
-    <div >
+    <div>
         <div onClick={handleReset}>
             {twoDigits(minutesToDisplay)}:{twoDigits(secondsToDisplay)}
         </div>

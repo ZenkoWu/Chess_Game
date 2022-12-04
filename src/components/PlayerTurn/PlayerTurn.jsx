@@ -1,7 +1,17 @@
 import { colors } from "../../constants/figureTypes"
 import Timer from "../Timer/Timer"
 
-export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side, isCheckmate, resetTimer}) => {
+export const PlayerTurn = (
+    {
+        isPlayerTurn, 
+        history, 
+        getFigureClasses, 
+        side, 
+        isCheckmate, 
+        resetTimer, 
+        isDraw
+    }) => {
+
     const placeholder = '--:--'
     const killedFigures = history.filter(el => el.secondTap?.figure && el.figureColor === side)
      
@@ -10,7 +20,10 @@ export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side, isChe
         white: {bgColor: colors.WHITE, color: colors.BLACK},
     }
     return (
-        <div className={`bg-${style[side].bgColor} text-${style[side].color} ` + (!isPlayerTurn && 'opacity-50')}>
+        <div className={
+            `bg-${style[side].bgColor} text-${style[side].color} ` + 
+            (!isDraw && !isCheckmate && !isPlayerTurn && 'opacity-50')
+        }>
 
             <div className='row m-0 mw-100 py-1 px-2'>
                 <div className='col-lg-10 text-start ps-1'>{side + ' side'}</div>
@@ -19,13 +32,14 @@ export const PlayerTurn = ({isPlayerTurn, history, getFigureClasses, side, isChe
                         isCountdown={isPlayerTurn} 
                         isCheckmate={isCheckmate} 
                         resetTimer={resetTimer}
+                        isDraw={isDraw}
                     />
                 </div>
             </div> 
 
             <div className='d-flex'>
 
-                <div className={'p-2 w-50 fs-4 ' + (!isCheckmate && isPlayerTurn && 'playerTurn')}>
+                <div className={'p-2 w-50 fs-4 ' + (!isDraw && !isCheckmate && isPlayerTurn && 'playerTurn')}>
                     {placeholder}
                 </div>
 

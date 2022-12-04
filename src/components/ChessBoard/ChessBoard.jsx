@@ -35,7 +35,8 @@ export default function ChessBoard(
         getFigureClasses, 
         setFigureMoves,
         check,
-        isCheckmate
+        isCheckmate,
+        isDraw
     }) {
 
     return (
@@ -60,6 +61,7 @@ export default function ChessBoard(
                                 isCellFirstTap={isCellFirstTap}
                                 check={check}
                                 isCheckmate={isCheckmate}
+                                isDraw={isDraw}
                             />
                         ))}
                     </div>

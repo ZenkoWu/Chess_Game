@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
     arrDefaultFigurePosition, 
+    figuresInitialState, 
     lettersAxis,
     maxBoardHeight, 
     maxBoardWidth, 
@@ -16,20 +17,7 @@ import { ChangePawnTypeModal } from '../Modal/ChangePawnTypeModal';
 
 export function ChessGame() {
 
-    const [figures, setFigures] = useState(
-        Array.from({ length: 32 }, (_, i) => ({
-        id: i + 1,
-        color: i < 16 ? colors.BLACK : colors.WHITE,
-        type: (
-            (pieces.ROOK + ' ').repeat(2) +
-            (pieces.KNIGHT + ' ').repeat(2) +
-            (pieces.BISHOP + ' ').repeat(2) +
-            (pieces.QUEEN + ' ') +
-            (pieces.KING + ' ') +
-            (pieces.PAWN + ' ').repeat(8)
-        ).split(' ')[i % (maxBoardWidth * 2)],
-        }))
-    );
+    const [figures, setFigures] = useState(figuresInitialState)
 
     const [cells, setCells] = useState(
         Array.from({ length: maxBoardWidth * maxBoardHeight }, (_, i) => ({
@@ -44,7 +32,6 @@ export function ChessGame() {
     const [playerSide, setPlayerSide] = useState(colors.WHITE);
     const [move, setMove] = useState({});
     const [history, setHistory] = useState([]);
-    const historyPush = (move, isCheck) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide, isCheck }]);
     const [availableToMove, setAvailableToMove] = useState([]);
 
     useEffect(() => {
@@ -60,7 +47,10 @@ export function ChessGame() {
     const [isCheckmate, setCheckmate] = useState(false)
     
     const [resetTimer, setResetTimer] = useState(true)
-
+    const [isDraw, setDraw] = useState(false)
+    
+    const historyPush = (move) => setHistory((prev) => [...prev, { ...move, figureColor: playerSide}]);
+    
     const whiteKingId = figures.find(fig => fig.type === pieces.KING && fig.color === colors.WHITE)?.id
     const blackKingId = figures.find( fig => fig.type === pieces.KING && fig.color === colors.BLACK)?.id
 
@@ -68,7 +58,7 @@ export function ChessGame() {
         let cellsWithFigures = cells.filter(el => el.figure)
         .map(el => {
             let figure = getFigureById(el.figure)
-            return {type: figure.type, color: figure.color}
+            return {type: figure?.type, color: figure?.color}
         })
 
         let blackKingWithLightFigure = cellsWithFigures.filter(el => 
@@ -86,10 +76,13 @@ export function ChessGame() {
        
         let twoKing = cellsWithFigures.length === 2
 
-       if(twoKing || (blackKingWithLightFigure.length == 2 && whiteKingWithLightFigure.length == 2)) {
-            console.log('ничья')
+       if(
+            twoKing || 
+            (blackKingWithLightFigure.length == 2 || whiteKingWithLightFigure.length == 2 && cellsWithFigures <= 4)
+        ) {
+            setDraw(true)
         }
-    }, [move.secondTap])
+    }, [playerSide, modalWindow]) 
 
     useEffect(()=> {
 
@@ -111,7 +104,7 @@ export function ChessGame() {
             if (dotsForPlayerSideFiguresMove.length < 1) 
                 setCheckmate(true)
         }
-    }, [cells, check])
+    }, [cells, check, modalWindow])
 
     useEffect(() => {
 
@@ -132,7 +125,7 @@ export function ChessGame() {
             setCheck({isCheck: true, cellId: cellWithWhiteKing.id})
         }
 
-    }, [playerSide])
+    }, [playerSide, modalWindow])
 
     useEffect(() => {
         if (move.secondTap) {
@@ -167,6 +160,7 @@ export function ChessGame() {
             }
 
             setMove({});  
+            // todo debug
             setPlayerSide(prev => prev === colors.WHITE ? colors.BLACK : colors.WHITE)
             setCheck({isCheck: false})
             
@@ -237,7 +231,7 @@ export function ChessGame() {
             let cell = getCellById(el)
             // todo debug
             return (
-                cell.x <= xOfAttackingFigure && cell.x >= xOfKing && cell.y > yOfAttackingFigure && cell.y < yOfKing ||
+                cell.x <= xOfAttackingFigure && cell.x >= xOfKing && cell.y >= yOfAttackingFigure && cell.y <= yOfKing ||
                 cell.x > xOfAttackingFigure && cell.x <= xOfKing && cell.y < yOfAttackingFigure && cell.y > yOfKing ||
                 cell.x === xOfAttackingFigure && cell.x === xOfKing && cell.y < yOfAttackingFigure && cell.y > yOfKing || //конь
                 cell.x < xOfAttackingFigure && cell.x > xOfKing && cell.y < yOfAttackingFigure && cell.y > yOfKing ||
@@ -251,7 +245,6 @@ export function ChessGame() {
                 attackingPiece.secondTap.id == el // может убить фигуру 
             ) 
         )
-
     }
 
     function setDefaultFigurePosition(arr) {
@@ -292,19 +285,13 @@ export function ChessGame() {
     const getFigureClasses = (id, shadow, type, color) => {
         const figure = getFigureById(id);
 
-        if (figure) {
+        if (figure || type) {
             return (
-                figureTypes.find((it) => it.value === figure.type)?.icon + ' text-' + figure.color +
-                (figure.color === colors.WHITE && shadow ? ' figureShadow' : '')
+                figureTypes.find((it) => it.value === figure?.type || it.value === type)?.icon 
+                + ' text-' + (figure?.color || color) +
+                ((figure?.color === colors.WHITE || color === colors.WHITE) && shadow ? ' figureShadow' : '')
             );
         } 
-        
-        else if (type) {
-            return (
-                figureTypes.find((it) => it.value === type)?.icon + ' text-' + color +
-                (color === colors.WHITE && shadow ? ' figureShadow' : '')
-            );
-        }
 
         return false;
     };
@@ -353,8 +340,6 @@ export function ChessGame() {
                 else if (check.isCheck) {
                     if(figure.color == playerSide && otherFigure.color == playerSide) 
                         return true;    
-                    // if(otherFigure.color == playerSide) 
-                    //     return true;  
                     else if (otherFigure.color !== playerSide) {
                         array.push(getCellId(x, y));
                         return true; 
@@ -471,22 +456,24 @@ export function ChessGame() {
     };
 
     const changePawnType = (newPawnType, color) => {
-        let id = Math.random() 
-        // console.log(figures.length + 100)
+        let id = Math.random() + 100
         setFigures(prev => [...prev, {color, type: newPawnType, id}])
 
         setFigureInCell(id, modalWindow.figX, modalWindow.figY)
         setModalWindow({isOpened: false})
+
     }
     
     let restartGame = () => {
         setDefaultFigurePosition(arrDefaultFigurePosition);
         setMatchNumber(Math.floor(Math.random() * 10000000));
+        setFigures(figuresInitialState)
         setCheckmate(false)
         setCheck({isCheck: false})
         setHistory([])
         setPlayerSide(colors.WHITE)
         setResetTimer(true)
+        setDraw(false)
     }
 
     return (
@@ -508,12 +495,26 @@ export function ChessGame() {
                 </div>
                 
                 <div className='pt-2 text-white fw-bold'>
-                    <div className={'opacity-0' + (isCheckmate && ' p-4 opacity-100 animated bg-gold')}>
+                    <div className={'opacity-0' + ((isCheckmate || isDraw)  && ' p-4 opacity-100 animated bg-gold')}>
                             {
                                 isCheckmate &&
                                 <>
                                     <div>{'Шах и мат!'}</div>
                                     <div>{'Победили черные!'}</div>
+                                    <div onClick={()=> restartGame()} className='cursor pt-3'>
+                                        <span className=' p-2 bg-green rounded-3'>
+                                            <i class="fa-solid fa-rotate-right pe-2"/>
+                                            {'Начать игру сначала'}
+                                        </span>
+                                    </div>
+                                </>
+                            }
+                            {
+                                isDraw && 
+                                <>
+                                    <div>{'Результат'}</div>
+                                    <div>{'Ничья'}</div>
+                                    <div>{'Недостаточность материала'}</div>
                                     <div onClick={()=> restartGame()} className='cursor pt-3'>
                                         <span className=' p-2 bg-green rounded-3'>
                                             <i class="fa-solid fa-rotate-right pe-2"/>
@@ -542,6 +543,7 @@ export function ChessGame() {
                     getFigureClasses={getFigureClasses}
                     check={check}
                     isCheckmate={isCheckmate}
+                    isDraw={isDraw}
                 />  
             </div>
 
@@ -554,6 +556,7 @@ export function ChessGame() {
                     side={colors.BLACK} 
                     isCheckmate={isCheckmate}
                     resetTimer={resetTimer}
+                    isDraw={isDraw}
                 />
             
                 <HistoryBoard 
@@ -577,6 +580,7 @@ export function ChessGame() {
                     side={colors.WHITE}
                     isCheckmate={isCheckmate}
                     resetTimer={resetTimer}
+                    isDraw={isDraw}
                 />
 
             </div>

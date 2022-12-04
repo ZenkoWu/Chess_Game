@@ -9,7 +9,8 @@ export const Cell=(
         setFigureMoves,
         getFigureClasses,
         check,
-        isCheckmate
+        isCheckmate,
+        isDraw
     }) => {
 
     const getDefaultCellColor = (x, y) => 
@@ -27,7 +28,7 @@ export const Cell=(
                 getDefaultCellColor(x, y) +
                 ' opacity-75 d-flex justify-content-center align-items-center ' +
                 (check.cellId === id ? ' bg-red ' : '') +
-                (!isCheckmate && canActivateCell(figure, id) ) +
+                (isDraw || !isCheckmate && canActivateCell(figure, id) ) +
                 (isCellFirstTap(id) ? ' activeCell ' : '') +
                 (
                     isIncludesCellIdToMove && figure ? 
@@ -40,7 +41,7 @@ export const Cell=(
                 )
             }
             style={{width: '4.1rem', height: '4.1rem'}}
-            onClick={() => !isCheckmate && setFigureMoves(cell)}
+            onClick={() => isDraw || !isCheckmate && setFigureMoves(cell)}
         >
             { isIncludesCellIdToMove && figure && <img src={sword} width='50px' /> }
             <div className={`${getFigureClasses(cell?.figure, 'shadow')} fs-1 position-absolute`}/>

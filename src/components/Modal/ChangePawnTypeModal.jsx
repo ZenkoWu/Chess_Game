@@ -5,7 +5,7 @@ export const ChangePawnTypeModal = ({getFigureClasses, candidates, changePawnTyp
         return (
             <div className={' col-3 fs-100'}>
                 <i 
-                    className={getFigureClasses(false, 'shadow', type, color) + ' cursor'} 
+                    className={getFigureClasses(null, 'shadow', type, color) + ' cursor'} 
                     onClick={() => changePawnType(type, color)}
                 />
             </div>
