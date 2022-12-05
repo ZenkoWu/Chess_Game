@@ -9,5 +9,6 @@ To write the program were used:
 - HTML
 - Bootstrap
 - Css
+
 The project is based on a component approach and reusing these same components (which is the main feature of React).
 
