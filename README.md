@@ -16,4 +16,6 @@ More about the project
 
 1.You can change theme of your game 
 
-<img align="center" width="350" height="260" src="2023-04-03_16-09-40.png" alt="dark-theme">
+Dark theme
+<img align="center" src="2023-04-03_16-09-40.png" alt="dark-theme">
+
