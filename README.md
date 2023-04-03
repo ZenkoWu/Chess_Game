@@ -12,3 +12,6 @@ To write the program were used:
 
 The project is based on a component approach and reusing these same components (which is the main feature of React).
 
+More about the project
+1.You can change theme of your game 
+<img src="![image](https://user-images.githubusercontent.com/107932116/229518607-054f6538-d0b6-4a08-aebc-7603a0e55208.png)"/>
