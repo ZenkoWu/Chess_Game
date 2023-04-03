@@ -13,6 +13,7 @@ To write the program were used:
 The project is based on a component approach and reusing these same components (which is the main feature of React).
 
 **More about the project**
+
 1.You can change theme of your game 
 
 Dark theme
