@@ -1,39 +1,41 @@
 <img align="right" width="280" height="280" src="readMeImg/2022-12-05_13-40-15.png" alt="react-chess">
 
 # React-chess
-The project was developed for the purpose of playing chess. While it is under development, but now you can use it for the game, because it has the main functionality for moving pieces, the ability to check and checkmate the opponent.
+Проект был разработан для игры в шахматы. Пока он находится в процессе разработки, но вы уже можете использовать его для игры, поскольку основной функционал по 
+переемещению фигур, возможности ставить шах и мат противнику уже доступен.
 
-To write the program were used: 
+
+Для написания программы использовались: 
 - Javascript 
 - React 
 - HTML
 - Bootstrap
 - Css
 
-The project is based on a component approach and reusing these same components (which is the main feature of React).
+Проект основан на функциональном подходе и переиспользовании компонент (что является одной из главных преимуществ Реакт).
 
-**More about the project**
+**Подробности о проекте**
 
-1.You can change theme of your game 
+1.Вы можете изменить тему своей игры
 
-Dark theme
+Темная тема
 <img align="center" src="readMeImg/2023-04-03_16-09-40.png" alt="dark-theme">
 
-Light theme
+Светлая тема
 <img align="center" src="readMeImg/2023-04-03_16-14-29.png" alt="light-theme">
 
 
-2. You can see the potential moves of your pieces
+2. Вы можете видеть потенциальные ходы своих фигур
 <img align="center" src="readMeImg/2023-04-03_16-17-18.png" alt="light-theme">
 
 
-3. Each player has a timer indicating the remaining time of the game
+3.У каждого игрока есть свой таймер, показывающий оставшееся время игры
 <img align="center" src="readMeImg/2023-04-03_16-28-47.png" alt="timer">
 
 
-4. On the right side of the web application, you can see the display of the players' moves
+4. С правой стороны веб-приложения вы можете видеть борд с историей ходов игроков
 <img align="center" src="readMeImg/2023-04-03_16-31-50.png" alt="timer">
 
 
-5.When your pawn comes to the edge of the board, it can promote to any piece except the king.
+5.Когда ваша пешка достигает края доски, она может превратиться в любую фигуру (кроме короля и самой себя)
 <img align="center" src="readMeImg/2023-04-03_16-35-04.png" alt="timer">
