@@ -29,3 +29,11 @@
 .bg-gold {
   background-color: #dea832;
 }
+
+.noselect {
+  user-select: none;
+}
+
+.bg-blue {
+  background-color: #9fb0b2;
+}

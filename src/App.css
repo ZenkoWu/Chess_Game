@@ -7,7 +7,7 @@
 
 .App {
   text-align: center;
-  background-color: rgb(226, 197, 169);
+  /* background-color: rgb(226, 197, 169); */
   width: 100%;
   height: 100%;
   /* color: white; */
@@ -22,4 +22,12 @@
 
 .playerTurn {
   background-color: rgba(100, 148, 78, 0.692);
+}
+
+.lightTheme {
+  background-color: rgb(226, 197, 169); 
+}
+
+.darkTheme {
+  background-color: rgb(73, 78, 83);
 }

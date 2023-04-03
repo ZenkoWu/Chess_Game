@@ -15,7 +15,7 @@ import { colors, figureTypes, pieces } from '../../constants/figureTypes';
 import { moveActions } from '../../constants/moveActions';
 import { ChangePawnTypeModal } from '../Modal/ChangePawnTypeModal';
 
-export function ChessGame() {
+export function ChessGame({changeTheme, theme}) {
 
     const [figures, setFigures] = useState(figuresInitialState)
 
@@ -476,8 +476,9 @@ export function ChessGame() {
         setDraw(false)
     }
 
+    const themeColor = theme === 'light' ? 'bg-brown' : 'bg-blue'
     return (
-        <div className='row m-0 mw-100 p-2 px-4'>
+        <div className='row m-0 mw-100 p-2 px-4 noselect'>
             {
                 modalWindow.isOpened && 
                 <ChangePawnTypeModal 
@@ -489,9 +490,17 @@ export function ChessGame() {
             }
 
             <div className='col-lg-3 col-sm-12 p-2 pb-0'>
-                <div className='bg-brown opacity-75 p-3 text-light'>
+                <div className={'opacity-75 p-3 text-light ' + themeColor}>
                     <div>{'Матч'}</div>
                     <div>{matchNumber}</div>
+                </div>
+                <div className='pt-4'>
+                    <div 
+                        className={'py-3 opacity-75 cursor ' + themeColor}
+                        onClick={changeTheme}
+                    >
+                        {'Сменить тему'}
+                    </div>
                 </div>
                 
                 <div className='pt-2 text-white fw-bold'>
@@ -562,10 +571,11 @@ export function ChessGame() {
                 <HistoryBoard 
                     history={history} 
                     getFigureClasses={getFigureClasses}
+                    themeColor={themeColor}
                 />
 
                 <div className='pb-1'>
-                    <div className='bg-brown'>
+                    <div className={themeColor}>
                         <div className='fs-2 text-white p-3'>
                             <i className='fa-solid fa-house pe-4 cursor'/>
                             <i className='fa-solid fa-flag fs-3 cursor'/>

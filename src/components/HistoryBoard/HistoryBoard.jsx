@@ -1,7 +1,7 @@
 import { OneMoveHistory } from './OneMoveHistory/OneMoveHistory'
 import { useEffect, useRef } from 'react'
 
-export let HistoryBoard = ({history, getFigureClasses}) => {
+export let HistoryBoard = ({history, getFigureClasses, themeColor}) => {
     
     const scroll = useRef(null);
 
@@ -11,7 +11,7 @@ export let HistoryBoard = ({history, getFigureClasses}) => {
 
     return (
         <div className='py-1'>
-            <div className='bg-brown py-1 px-3 text-center' style={{overflow: 'auto', height: '300px' }} ref={scroll}>
+            <div className={'py-1 px-3 text-center ' + themeColor} style={{overflow: 'auto', height: '300px' }} ref={scroll}>
                 {history.map((el, i) => (
                     <OneMoveHistory 
                         key={i}
